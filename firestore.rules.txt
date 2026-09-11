@@ -1,0 +1,12 @@
+Regler — i Firebase: Firestore → Rules → sæt dette ind mens du tester:
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /customers/{id} {
+      allow read, write: if true;
+    }
+  }
+}
+
+Vigtigt: det er åbent. Kun til test. Skift senere til login.

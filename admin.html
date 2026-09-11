@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Skærmkort — Danmark</title>
+  <title>Skærmkort</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -11,7 +11,9 @@
   <div class="shell">
     <aside class="side">
       <h1>Skærmkort</h1>
-      <p class="lead">Klik en prik. Ret lysavis og menukort. Kun den kunde får det.</p>
+      <p class="lead">Grøn kører · Gul noget galt · Rød tavs. Klik en prik og send lysavis.</p>
+      <p id="cfgwarn" class="warn hidden">Indsæt Firebase-nøgler i firebase-config.js</p>
+      <button type="button" class="ghost light" id="seed">Opret testkunder i databasen</button>
       <div id="list" class="cust-list"></div>
     </aside>
     <div class="main">
@@ -38,6 +40,9 @@
     </div>
   </div>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
   <script src="admin.js"></script>
 </body>
 </html>

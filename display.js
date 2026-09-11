@@ -4,8 +4,7 @@ const SCREEN_ID = params.get("screen") || "tv-1";
 
 function tickClock() {
   document.getElementById("clock").textContent = new Date().toLocaleTimeString("da-DK", {
-    hour: "2-digit",
-    minute: "2-digit",
+    hour: "2-digit", minute: "2-digit",
   });
 }
 
@@ -25,40 +24,37 @@ function render(data) {
     list.appendChild(el);
   });
   const t = document.getElementById("ticker");
-  const text = (data.ticker || "").trim() || " ";
+  const text = (data.ticker || " ").trim();
   t.innerHTML = "";
   const span = document.createElement("span");
   span.textContent = text + "   •   " + text + "   •   " + text;
   t.appendChild(span);
 }
 
-async function load() {
-  try {
-    const res = await fetch("/api/customer?id=" + encodeURIComponent(CUSTOMER_ID), { cache: "no-store" });
-    if (!res.ok) return;
-    render(await res.json());
-  } catch (e) {
-    console.warn(e);
+const cfg = window.firebaseConfig;
+if (!cfg || cfg.apiKey === "INDSÆT") {
+  document.getElementById("subtitle").textContent = "Firebase-nøgler mangler i firebase-config.js";
+} else {
+  firebase.initializeApp(cfg);
+  const db = firebase.firestore();
+  const ref = db.collection("customers").doc(CUSTOMER_ID);
+  ref.onSnapshot((snap) => {
+    if (snap.exists) render(snap.data());
+    else document.getElementById("subtitle").textContent = "Ukendt kunde: " + CUSTOMER_ID;
+  });
+  async function beat() {
+    await ref.set({
+      screens: {
+        [SCREEN_ID]: {
+          label: "Skærm 1",
+          lastSeen: firebase.firestore.FieldValue.serverTimestamp(),
+        },
+      },
+    }, { merge: true });
   }
-}
-
-async function beat() {
-  try {
-    await fetch("/api/heartbeat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        customerId: CUSTOMER_ID,
-        screenId: SCREEN_ID,
-        label: "Skærm 1",
-      }),
-    });
-  } catch (e) {}
+  beat();
+  setInterval(beat, 15000);
 }
 
 tickClock();
 setInterval(tickClock, 1000);
-load();
-beat();
-setInterval(load, 4000);
-setInterval(beat, 15000);
