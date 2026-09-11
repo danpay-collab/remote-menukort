@@ -4,8 +4,25 @@ const SCREEN_ID = params.get("screen") || "tv-1";
 
 function tickClock() {
   document.getElementById("clock").textContent = new Date().toLocaleTimeString("da-DK", {
+    timeZone: "Europe/Copenhagen",
     hour: "2-digit", minute: "2-digit",
   });
+}
+
+function parseHm(s) {
+  const p = String(s || "22:00").split(":");
+  return Number(p[0]) * 60 + Number(p[1] || 0);
+}
+
+function isNight(from, to) {
+  const now = new Date().toLocaleTimeString("en-GB", { timeZone: "Europe/Copenhagen", hour12: false });
+  const parts = now.split(":");
+  const cur = Number(parts[0]) * 60 + Number(parts[1]);
+  const a = parseHm(from);
+  const b = parseHm(to);
+  if (a === b) return false;
+  if (a < b) return cur >= a && cur < b;
+  return cur >= a || cur < b;
 }
 
 function render(data) {
@@ -55,7 +72,18 @@ function render(data) {
         el.querySelector(".num").textContent = it.num || "";
         el.querySelector(".name").textContent = it.name || "";
         el.querySelector(".desc").textContent = it.desc || "";
-        el.querySelector(".price").textContent = it.price ? it.price + ",-" : "";
+        const base = Number(String(it.price || "").replace(",", "."));
+        const add = (isNight(data.nightFrom || "22:00", data.nightTo || "05:00") ? Number(data.nightAdd || 0) : 0);
+        const shown = (Number.isFinite(base) && it.price !== "" && it.price != null)
+          ? String(base + add).replace(/\.0$/, "") + ",-"
+          : (it.price ? it.price + ",-" : "");
+        el.querySelector(".price").textContent = shown;
+        if (add) {
+          const n = document.createElement("span");
+          n.className = "badge";
+          n.textContent = "nat";
+          el.querySelector(".line").appendChild(n);
+        }
         if (it.badge) {
           const b = document.createElement("span");
           b.className = "badge";
@@ -73,12 +101,13 @@ function render(data) {
   t.textContent = text + "   •   " + text + "   •   " + text;
 }
 
+let lastMenu = null;
 const cfg = window.firebaseConfig;
 if (cfg && cfg.apiKey !== "INDSÆT") {
   firebase.initializeApp(cfg);
   const db = firebase.firestore();
   const ref = db.collection("customers").doc(CUSTOMER_ID);
-  ref.onSnapshot((snap) => { if (snap.exists) render(snap.data()); });
+  ref.onSnapshot((snap) => { if (snap.exists) { lastMenu = snap.data(); render(lastMenu); } });
   async function beat() {
     await ref.set({
       screens: { [SCREEN_ID]: { label: "Skærm 1", lastSeen: firebase.firestore.FieldValue.serverTimestamp() } },
@@ -89,6 +118,7 @@ if (cfg && cfg.apiKey !== "INDSÆT") {
 }
 tickClock();
 setInterval(tickClock, 1000);
+setInterval(() => { if (lastMenu) render(lastMenu); }, 30000);
 document.body.addEventListener("click", () => {
   if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
     document.documentElement.requestFullscreen().catch(() => {});
