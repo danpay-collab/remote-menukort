@@ -197,10 +197,7 @@ async function openCustomer(id) {
   items = c.items || [];
   drawItems();
   const prev = $("preview");
-  if (prev) {
-    const rows = (items || []).map((i) => (i.name || "") + "  " + (i.price ? i.price + ",-" : "")).join("<br>");
-    prev.innerHTML = "<strong>På TV nu</strong><br>" + (c.venue || "") + "<br>" + (c.ticker || "") + "<br>" + (rows || "(ingen retter endnu)");
-  }
+  if (prev) prev.remove();
   const base = location.origin + location.pathname.replace(/admin.html.*/, "");
   $("tvurl").textContent = "TV: " + base + "display.html?id=" + id;
   const box = $("pscreens");
@@ -366,6 +363,7 @@ async function openStudio() {
 }
 
 $("add").addEventListener("click", openStudio);
+if ($("viewmenu")) $("viewmenu").addEventListener("click", openStudio);
 $("saddcol").addEventListener("click", () => {
   sections.push({ title: "", items: [{ num: "", name: "", desc: "", price: "" }] });
   paintStudio();
