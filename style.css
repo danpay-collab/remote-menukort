@@ -96,3 +96,4 @@ select{width:100%;margin-top:4px;padding:10px 12px;border-radius:8px;border:1px 
 .side-form label{color:#cbbba6}
 .side-form input,.side-form select{background:#1b1713;color:#f4efe6;border-color:#3a3229}
 .side-form .primary{width:100%;margin-top:8px}
+preview { background:#1b1713;color:#f0d9a8;padding:10px;border-radius:10px;font-size:13px;margin:10px 0; }

@@ -4,6 +4,7 @@ let db = null;
 let currentId = null;
 let items = [];
 let map, markers = {};
+let placeMode = false;
 
 const SEED = {
   "38765432": {
@@ -74,6 +75,16 @@ function initMap() {
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: "&copy; OpenStreetMap-bidragsydere",
   }).addTo(map);
+  map.on("click", async (e) => {
+    if (!placeMode || !db || !currentId) return;
+    placeMode = false;
+    $("placehint").textContent = "Gemmer sted…";
+    await db.collection("customers").doc(currentId).set({
+      lat: e.latlng.lat,
+      lng: e.latlng.lng,
+    }, { merge: true });
+    $("placehint").textContent = "Kunden er sat på kortet.";
+  });
 }
 
 function paint(docs) {
@@ -99,7 +110,7 @@ function paint(docs) {
   }
   docs.forEach((c) => {
     const st = statusOf(c);
-    if (c.lat && c.lng) {
+    if (Number(c.lat) && Number(c.lng)) {
       if (markers[c.id]) {
         markers[c.id].setLatLng([c.lat, c.lng]);
         markers[c.id].setStyle({ color: color(st), fillColor: color(st) });
@@ -165,6 +176,11 @@ async function openCustomer(id) {
   $("footerNote").value = c.footerNote || "";
   items = c.items || [];
   drawItems();
+  const prev = $("preview");
+  if (prev) {
+    const rows = (items || []).map((i) => (i.name || "") + "  " + (i.price ? i.price + ",-" : "")).join("<br>");
+    prev.innerHTML = "<strong>På TV nu</strong><br>" + (c.venue || "") + "<br>" + (c.ticker || "") + "<br>" + (rows || "(ingen retter endnu)");
+  }
   const base = location.origin + location.pathname.replace(/admin.html.*/, "");
   $("tvurl").textContent = "TV: " + base + "display.html?id=" + id;
   const box = $("pscreens");
@@ -203,6 +219,11 @@ function start() {
   });
 }
 
+$("placebtn").addEventListener("click", () => {
+  if (!currentId) return;
+  placeMode = true;
+  $("placehint").textContent = "Klik ét sted på kortet — der sættes kunden.";
+});
 $("newbtn").addEventListener("click", () => {
   $("panel").classList.add("hidden");
   $("create").classList.remove("hidden");
