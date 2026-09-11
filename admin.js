@@ -359,6 +359,12 @@ async function openStudio() {
   }
   $("studio").classList.remove("hidden");
   $("stitle").textContent = c.name || currentId;
+  if ($("spx")) $("spx").value = c.pxW || 1920;
+  if ($("spy")) $("spy").value = c.pxH || 1080;
+  const on = c.tvScreens || [1];
+  if ($("sc1")) $("sc1").checked = on.indexOf(1) >= 0;
+  if ($("sc2")) $("sc2").checked = on.indexOf(2) >= 0;
+  if ($("sc3")) $("sc3").checked = on.indexOf(3) >= 0;
   paintStudio();
 }
 
@@ -396,7 +402,7 @@ if ($("sbg")) {
 if ($("sview")) {
   $("sview").addEventListener("click", () => {
     if (!currentId) return;
-    window.open("display.html?id=" + currentId, "_blank");
+    window.open("display.html?id=" + currentId + "&screen=1", "_blank");
   });
 }
 $("sclose").addEventListener("click", () => $("studio").classList.add("hidden"));
@@ -405,10 +411,17 @@ $("ssave").addEventListener("click", async () => {
   items = [];
   sections.forEach((s) => (s.items || []).forEach((it) => items.push({ ...it, visible: true })));
   try {
+    const tvs = [];
+    if ($("sc1") && $("sc1").checked) tvs.push(1);
+    if ($("sc2") && $("sc2").checked) tvs.push(2);
+    if ($("sc3") && $("sc3").checked) tvs.push(3);
     const payload = {
       sections,
       items,
       venue: "Menukort",
+      pxW: Number($("spx") && $("spx").value) || 1920,
+      pxH: Number($("spy") && $("spy").value) || 1080,
+      tvScreens: tvs.length ? tvs : [1],
     };
     if (pendingBg) payload.bg = pendingBg;
     await db.collection("customers").doc(currentId).set(payload, { merge: true });
