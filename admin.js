@@ -358,13 +358,34 @@ function paintStudio() {
   sections.forEach((sec, si) => {
     const col = document.createElement("div");
     col.className = "col-card";
-    col.innerHTML = `<input class="col-title" placeholder="BURGERS / PIZZA" /><div class="col-items"></div><button type="button" class="ghost" data-delcol>Fjern kolonne</button>`;
+    col.innerHTML = `<input class="col-title" placeholder="BURGERS / PIZZA" /><div class="sizes"><select class="scount"><option value="1">1 pris</option><option value="3">3 størrelser</option><option value="5">5 størrelser</option></select><div class="snames"></div></div><div class="col-items"></div><button type="button" class="ghost" data-delcol>Fjern kolonne</button>`;
     col.querySelector(".col-title").value = sec.title || "";
     col.querySelector(".col-title").addEventListener("input", (e) => { sections[si].title = e.target.value; });
     col.querySelector("[data-delcol]").addEventListener("click", () => {
       sections.splice(si, 1);
       paintStudio();
     });
+    const nSize = (sec.sizes && sec.sizes.length) ? sec.sizes.length : 1;
+    col.querySelector(".scount").value = String(nSize === 5 ? 5 : nSize === 3 ? 3 : 1);
+    const defs = { 3: ["Alm", "Deep pan", "Familie"], 5: ["Alm", "Deep pan", "Familie", "XL", "XXL"] };
+    function drawNames() {
+      const hold = col.querySelector(".snames");
+      hold.innerHTML = "";
+      const n = Number(col.querySelector(".scount").value);
+      if (n === 1) { sections[si].sizes = []; return; }
+      if (!sections[si].sizes || sections[si].sizes.length !== n) {
+        sections[si].sizes = (defs[n] || []).slice();
+      }
+      sections[si].sizes.forEach((lab, li) => {
+        const inp = document.createElement("input");
+        inp.value = lab;
+        inp.placeholder = "størrelse";
+        inp.addEventListener("input", () => { sections[si].sizes[li] = inp.value; });
+        hold.appendChild(inp);
+      });
+    }
+    col.querySelector(".scount").addEventListener("change", () => { drawNames(); paintStudio(); });
+    drawNames();
     const box = col.querySelector(".col-items");
     (sec.items || []).forEach((it, ii) => {
       const row = document.createElement("div");
@@ -373,7 +394,7 @@ function paintStudio() {
         <div class="prod-line">
           <input class="num" placeholder="nr" />
           <input class="pname" placeholder="Produkt" />
-          <input class="pprice" placeholder="pris" />
+          <span class="pprices"></span>
         </div>
         <input class="pdesc" placeholder="Beskrivelse" />
         <div class="prod-btns">
@@ -391,7 +412,23 @@ function paintStudio() {
         </div>`;
       row.querySelector(".num").value = it.num || "";
       row.querySelector(".pname").value = it.name || "";
-      row.querySelector(".pprice").value = it.price || "";
+      const pbox = row.querySelector(".pprices");
+      const count = Math.max(1, (sec.sizes && sec.sizes.length) || 1);
+      if (!it.prices || !it.prices.length) it.prices = [it.price || ""];
+      while (it.prices.length < count) it.prices.push("");
+      it.prices.length = count;
+      it.price = it.prices[0] || "";
+      it.prices.forEach((pr, pi) => {
+        const inp = document.createElement("input");
+        inp.className = "pprice";
+        inp.placeholder = (sec.sizes && sec.sizes[pi]) || "pris";
+        inp.value = pr || "";
+        inp.addEventListener("input", () => {
+          it.prices[pi] = inp.value;
+          if (pi === 0) it.price = inp.value;
+        });
+        pbox.appendChild(inp);
+      });
       row.querySelector(".pdesc").value = it.desc || "";
       row.querySelector(".pnight").value = it.nightAdd || "";
       row.querySelector(".pnfrom").value = it.nightFrom || "22:00";
@@ -401,7 +438,7 @@ function paintStudio() {
       row.querySelector(".plto").value = it.lunchTo || "15:00";
       row.querySelector(".num").addEventListener("input", (e) => { sections[si].items[ii].num = e.target.value; });
       row.querySelector(".pname").addEventListener("input", (e) => { sections[si].items[ii].name = e.target.value; });
-      row.querySelector(".pprice").addEventListener("input", (e) => { sections[si].items[ii].price = e.target.value; });
+      /* priser binds ovenfor */
       row.querySelector(".pdesc").addEventListener("input", (e) => { sections[si].items[ii].desc = e.target.value; });
       row.querySelector(".pnight").addEventListener("input", (e) => { sections[si].items[ii].nightAdd = e.target.value; });
       row.querySelector(".pnfrom").addEventListener("input", (e) => { sections[si].items[ii].nightFrom = e.target.value; });
@@ -530,6 +567,86 @@ if ($("sbg")) {
     $("stitle").textContent = "Klemmer billede…";
     pendingBg = await shrinkImage(f);
     $("stitle").textContent = "Baggrund klar — send til TV";
+  });
+}
+function addScanned(title, found) {
+  if (!found || !found.length) {
+    alert("Ingen linjer i filen.");
+    return;
+  }
+  sections.push({ title: title || "MENU", items: found });
+  paintStudio();
+  if ($("sstatus")) $("sstatus").textContent = "Kladde — ikke sendt";
+  alert(found.length + " linjer ind. Tjek og send til TV.");
+}
+function rowsToItems(rows) {
+  const found = [];
+  (rows || []).forEach((r) => {
+    const cells = (Array.isArray(r) ? r : [r]).map((c) => String(c == null ? "" : c).trim());
+    if (!cells.some(Boolean)) return;
+    const joined = cells.join(" ");
+    if (/overskrift|kolonne|^navn$|^pris$/i.test(joined) && !found.length) return;
+    let num = "", name = "", desc = "", price = "";
+    if (cells.length >= 4) {
+      num = cells[0]; name = cells[1]; desc = cells[2]; price = String(cells[3]).replace(/[^\d.,]/g, "");
+    } else if (cells.length === 3) {
+      if (/^\d+$/.test(cells[0])) { num = cells[0]; name = cells[1]; price = String(cells[2]).replace(/[^\d.,]/g, ""); }
+      else { name = cells[0]; desc = cells[1]; price = String(cells[2]).replace(/[^\d.,]/g, ""); }
+    } else if (cells.length === 2) {
+      name = cells[0]; price = String(cells[1]).replace(/[^\d.,]/g, "");
+    } else {
+      name = joined;
+    }
+    if (name || price) found.push({ num, name, desc, price, nightAdd: "", lunchAdd: "" });
+  });
+  return found;
+}
+async function readDocx(file) {
+  const zip = await JSZip.loadAsync(file);
+  const xml = await zip.file("word/document.xml").async("string");
+  return xml.replace(/<w:p[^>]*>/g, "\n").replace(/<[^>]+>/g, " ").replace(/&amp;/g, "&");
+}
+async function readPdf(file) {
+  if (!window.pdfjsLib) throw new Error("PDF-læser mangler. Genindlæs siden.");
+  pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.js";
+  const buf = await file.arrayBuffer();
+  const doc = await pdfjsLib.getDocument({ data: buf }).promise;
+  let text = "";
+  for (let i = 1; i <= doc.numPages; i++) {
+    const page = await doc.getPage(i);
+    const content = await page.getTextContent();
+    text += content.items.map((it) => it.str).join(" ") + "\n";
+  }
+  return text;
+}
+if ($("sfilebtn") && $("sfile")) $("sfilebtn").addEventListener("click", () => $("sfile").click());
+if ($("sfile")) {
+  $("sfile").addEventListener("change", async (e) => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    const nm = (f.name || "").toLowerCase();
+    $("stitle").textContent = "Læser fil…";
+    try {
+      if (/\.(xlsx|xls|csv)$/.test(nm)) {
+        if (!window.XLSX) throw new Error("Excel-læser mangler. Genindlæs siden.");
+        const wb = XLSX.read(await f.arrayBuffer(), { type: "array" });
+        const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1 });
+        addScanned(wb.SheetNames[0], rowsToItems(rows));
+      } else if (nm.endsWith(".docx")) {
+        const p = linesToItems(await readDocx(f));
+        addScanned(p.title, p.found);
+      } else if (nm.endsWith(".pdf")) {
+        const p = linesToItems(await readPdf(f));
+        addScanned(p.title, p.found);
+      } else {
+        const p = linesToItems(await f.text());
+        addScanned(p.title, p.found);
+      }
+    } catch (err) {
+      alert("Filen kunne ikke læses: " + err.message);
+    }
+    $("stitle").textContent = currentId || "";
+    e.target.value = "";
   });
 }
 if ($("sscanbtn") && $("sscan")) $("sscanbtn").addEventListener("click", () => $("sscan").click());

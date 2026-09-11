@@ -63,6 +63,12 @@ function render(data) {
       const h = document.createElement("h2");
       h.textContent = sec.title || "";
       box.appendChild(h);
+      if (sec.sizes && sec.sizes.length > 1) {
+        const sh = document.createElement("div");
+        sh.className = "sizehead";
+        sh.textContent = sec.sizes.join("   ·   ");
+        box.appendChild(sh);
+      }
       if (sec.note) {
         const n = document.createElement("p");
         n.className = "desc";
@@ -83,7 +89,11 @@ function render(data) {
         const shown = (Number.isFinite(base) && it.price !== "" && it.price != null)
           ? String(base + add).replace(/\.0$/, "") + ",-"
           : (it.price ? it.price + ",-" : "");
-        el.querySelector(".price").textContent = shown;
+        const list = (it.prices && it.prices.length > 1) ? it.prices : [it.price];
+        el.querySelector(".price").textContent = list.filter((p) => p !== "" && p != null).map((p) => {
+          const n = Number(String(p).replace(",", "."));
+          return (Number.isFinite(n) ? String(n + add).replace(/\.0$/, "") : p) + ",-";
+        }).join("  ");
         if (add) {
           const n = document.createElement("span");
           n.className = "badge";

@@ -152,3 +152,7 @@ input[hidden] { display: none !important; }
 .cut { border-top: 2px dashed #c0392b; color: #c0392b; font-size: 12px; margin-top: 10px; padding-top: 8px; font-weight: 700; }
 .draft { color: #e0b04a; font-size: 12px; }
 .studio-bar .live { color: #6dca7a; font-size: 12px; }
+.sizes { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0; align-items: center; }
+.snames input { width: 88px; }
+.pprices { display: flex; gap: 4px; }
+.pprices input { width: 58px; }
