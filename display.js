@@ -14,9 +14,13 @@ function render(data) {
   document.body.style.backgroundSize = "cover";
   document.body.style.backgroundPosition = "center";
   const board = document.getElementById("board");
-  const w = Number(data.pxW) || window.innerWidth || 1920;
-  const colN = Math.max(1, Math.min(8, Math.floor(w / 280) || 4));
-  board.style.gridTemplateColumns = "repeat(" + colN + ", 1fr)";
+  const designed = Number(data.pxW) || 1920;
+  const w = window.innerWidth || designed;
+  const colN = (data.sections && data.sections.length) ? data.sections.length : 4;
+  board.style.gridTemplateColumns = "repeat(" + colN + ", minmax(0, 1fr))";
+  const scale = Math.max(0.65, Math.min(1.1, w / designed));
+  document.documentElement.style.fontSize = (15 * scale) + "px";
+  board.style.fontSize = (12 * scale) + "px";
   board.innerHTML = "";
   let sections = (data.sections && data.sections.length) ? data.sections : [];
   const hasSecItems = sections.some((s) => s && s.items && s.items.length);
