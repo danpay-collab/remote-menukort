@@ -69,7 +69,7 @@ function render(data) {
         n.textContent = sec.note;
         box.appendChild(n);
       }
-      (sec.items || []).forEach((it) => {
+      (sec.items || []).filter((it) => it && it.visible !== false).forEach((it) => {
         const el = document.createElement("article");
         el.className = "row";
         el.innerHTML = `<div class="num"></div><div><div class="line"><span class="name"></span></div><p class="desc"></p></div><div class="price"></div>`;

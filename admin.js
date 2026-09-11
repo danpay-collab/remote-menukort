@@ -379,6 +379,7 @@ function paintStudio() {
         <div class="prod-btns">
           <button type="button" data-add>+</button>
           <button type="button" data-del>−</button>
+          <button type="button" data-eye>øje</button>
           <button type="button" data-night>Natpris</button>
           <input class="pnight extra" placeholder="+ nat" />
           <input class="pnfrom extra" placeholder="22:00" />
@@ -422,8 +423,21 @@ function paintStudio() {
         sections[si].items.splice(ii, 1);
         paintStudio();
       });
+      if (it.visible === false) row.classList.add("off");
+      row.querySelector("[data-eye]").addEventListener("click", () => {
+        sections[si].items[ii].visible = sections[si].items[ii].visible === false;
+        paintStudio();
+        if ($("sstatus")) $("sstatus").textContent = "Kladde — ikke sendt";
+      });
       box.appendChild(row);
     });
+    const limit = Math.max(6, Math.floor(((Number($("spy") && $("spy").value) || 1080) - 220) / 78));
+    if ((sec.items || []).length >= limit) {
+      const cut = document.createElement("div");
+      cut.className = "cut";
+      cut.textContent = "Her slutter skærmen (" + ($("spy") && $("spy").value || 1080) + "). Start en ny kolonne.";
+      box.appendChild(cut);
+    }
     board.appendChild(col);
   });
 }
@@ -477,6 +491,18 @@ document.querySelectorAll(".tab").forEach((t) => {
     applyScreen(t.getAttribute("data-scr"));
   });
 });
+if ($("scopy")) {
+  $("scopy").addEventListener("click", () => {
+    stashScreen();
+    const n = String(Math.min(5, Number(activeScreen) + 1));
+    boardsByScreen[n] = JSON.parse(JSON.stringify(boardsByScreen[activeScreen] || { sections: [] }));
+    const has = $("has" + n);
+    if (has) has.checked = true;
+    applyScreen(n);
+    if ($("sstatus")) $("sstatus").textContent = "Kladde — ikke sendt";
+    alert("Kopieret til skærm " + n + ". Ret og send.");
+  });
+}
 $("saddcol").addEventListener("click", () => {
   sections.push({ title: "", items: [{ num: "", name: "", desc: "", price: "" }] });
   paintStudio();
@@ -568,6 +594,7 @@ $("ssave").addEventListener("click", async () => {
     };
     if (pendingBg) payload.bg = pendingBg;
     await db.collection("customers").doc(currentId).set(payload, { merge: true });
+    if ($("sstatus")) { $("sstatus").textContent = "Live"; $("sstatus").className = "live"; }
     $("studio").classList.add("hidden");
     alert("Sendt til TV. Genindlæs skærmen.");
   } catch (err) {

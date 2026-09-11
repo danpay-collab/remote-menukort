@@ -148,3 +148,7 @@ preview { background:#1b1713;color:#f0d9a8;padding:10px;border-radius:10px;font-
 .studio-bar .go { background: #1f7a3a !important; color: #fff !important; }
 input[hidden] { display: none !important; }
 .studio-bar input[type=number] { width: 90px !important; min-width: 90px; }
+.prod.off { opacity: .4; }
+.cut { border-top: 2px dashed #c0392b; color: #c0392b; font-size: 12px; margin-top: 10px; padding-top: 8px; font-weight: 700; }
+.draft { color: #e0b04a; font-size: 12px; }
+.studio-bar .live { color: #6dca7a; font-size: 12px; }
