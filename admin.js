@@ -534,38 +534,81 @@ if ($("sbg")) {
 }
 if ($("sscanbtn") && $("sscan")) $("sscanbtn").addEventListener("click", () => $("sscan").click());
 if ($("sbgbtn") && $("sbg")) $("sbgbtn").addEventListener("click", () => $("sbg").click());
+function prepScan(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement("canvas");
+      const scale = Math.max(2, 1600 / Math.max(img.width, 1));
+      c.width = Math.round(img.width * scale);
+      c.height = Math.round(img.height * scale);
+      const ctx = c.getContext("2d");
+      ctx.drawImage(img, 0, 0, c.width, c.height);
+      const pix = ctx.getImageData(0, 0, c.width, c.height);
+      for (let i = 0; i < pix.data.length; i += 4) {
+        const g = pix.data[i] * 0.3 + pix.data[i + 1] * 0.59 + pix.data[i + 2] * 0.11;
+        const v = g < 150 ? 0 : 255;
+        pix.data[i] = pix.data[i + 1] = pix.data[i + 2] = v;
+      }
+      ctx.putImageData(pix, 0, 0);
+      resolve(c);
+    };
+    img.onerror = reject;
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+function linesToItems(text) {
+  const lines = String(text || "").split(/\n/).map((l) => l.replace(/\s+/g, " ").trim()).filter((l) => l.length > 1);
+  const found = [];
+  let title = "SCAN";
+  lines.forEach((line) => {
+    let m = line.match(/^(?:(\d{1,3})[.)\s]+)?(.+?)\s+[-–]?\s*(\d{2,4})\s*[,.-]?\s*-?\s*$/);
+    if (!m) m = line.match(/(\d{2,4})\s*[,.-]?\s*-?\s*$/);
+    if (m && m[3]) {
+      found.push({ num: m[1] || "", name: (m[2] || "").trim(), desc: "", price: m[3], nightAdd: "", lunchAdd: "" });
+    } else if (m && m[1] && !m[3]) {
+      const price = m[1];
+      const name = line.replace(price, "").replace(/[,.\-]+$/, "").trim();
+      found.push({ num: "", name: name || line, desc: "", price: price, nightAdd: "", lunchAdd: "" });
+    } else if (/^[A-ZÆØÅ0-9 .&/]{3,28}$/.test(line)) {
+      if (!found.length) title = line;
+      else found.push({ num: "", name: line, desc: "", price: "", nightAdd: "", lunchAdd: "" });
+    } else if (found.length) {
+      found[found.length - 1].desc = (found[found.length - 1].desc + " " + line).trim();
+    } else {
+      found.push({ num: "", name: line, desc: "", price: "", nightAdd: "", lunchAdd: "" });
+    }
+  });
+  return { title, found };
+}
+
 if ($("sscan")) {
   $("sscan").addEventListener("change", async (e) => {
     const f = e.target.files && e.target.files[0];
     if (!f) return;
-    if (!window.Tesseract) { alert("Scanner-biblioteket blev ikke hentet."); return; }
+    if (!window.Tesseract) { alert("Scanner-biblioteket blev ikke hentet. Tjek nettet og genindlæs."); return; }
     $("stitle").textContent = "Scanner menukort…";
     try {
-      const out = await Tesseract.recognize(f, "dan+eng");
-      const lines = (out.data.text || "").split(/\n/).map((l) => l.trim()).filter(Boolean);
-      const found = [];
-      let title = "SCAN";
-      lines.forEach((line) => {
-        const m = line.match(/^(?:(\d{1,3})\s+)?([A-Za-zÆØÅæøå0-9 .'\-]+?)\s+(\d{2,4})\s*,?-?\s*$/);
-        if (m) {
-          found.push({ num: m[1] || "", name: m[2].trim(), desc: "", price: m[3], nightAdd: "", lunchAdd: "" });
-        } else if (line === line.toUpperCase() && line.length < 28) {
-          title = line;
-        } else if (found.length) {
-          found[found.length - 1].desc = (found[found.length - 1].desc + " " + line).trim();
-        }
-      });
-      if (!found.length) {
-        alert("Kunne ikke læse retter. Skriv dem selv, eller tag et skarpere billede.");
-      } else {
-        sections.push({ title: title, items: found });
-        paintStudio();
-        alert("Læste " + found.length + " linjer. Tjek og ret før du sender.");
+      const canvas = await prepScan(f);
+      let out = await Tesseract.recognize(canvas, "eng", { logger: () => {} });
+      let parsed = linesToItems(out.data && out.data.text);
+      if (parsed.found.length < 2) {
+        out = await Tesseract.recognize(f, "eng");
+        const again = linesToItems(out.data && out.data.text);
+        if (again.found.length > parsed.found.length) parsed = again;
       }
+      if (!parsed.found.length) {
+        parsed.found.push({ num: "", name: "Læst — ret navnet", desc: (out.data && out.data.text) || "", price: "", nightAdd: "", lunchAdd: "" });
+      }
+      sections.push({ title: parsed.title || "SCAN", items: parsed.found });
+      paintStudio();
+      alert("Sat " + parsed.found.length + " linjer ind. Ret navne og priser, så send.");
     } catch (err) {
       alert("Scan fejlede: " + err.message);
     }
     $("stitle").textContent = currentId || "";
+    e.target.value = "";
   });
 }
 if ($("sview")) {
