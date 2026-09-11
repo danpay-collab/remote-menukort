@@ -17,7 +17,8 @@
       <button type="button" class="ghost light" id="seed">Opret testkunder</button>
       <section class="side-form hidden" id="create">
         <h2>Ny kunde</h2>
-        <label>CVR eller kundenummer (valgfrit) <input id="cvr" placeholder="kan udfyldes senere" /></label>
+        <label>CVR-nummer <input id="cvr" placeholder="8 cifre" /></label>
+        <button type="button" class="ghost light" id="cvrbtn">Slå CVR op</button>
         <label>Firmanavn / pizzeria <input id="cname" /></label>
         <label>Adresse <input id="caddr" /></label>
         <label>Postnr. <input id="czip" maxlength="4" placeholder="5471" /></label>
@@ -52,6 +53,7 @@
         <button type="button" class="ghost" id="placebtn">Placer kunden på kortet</button>
         <p class="muted" id="placehint"></p>
         <button type="button" class="primary" id="viewmenu">Vis menukort</button>
+        <button type="button" class="ghost" id="cvrupd">Opdater fra CVR</button>
         <label>Firmanavn <input id="ename" /></label>
         <label>Adresse <input id="eaddr" /></label>
         <label>Postnr. <input id="ezip" maxlength="4" placeholder="5471" /></label>

@@ -245,6 +245,58 @@ $("newbtn").addEventListener("click", () => {
   $("create").classList.remove("hidden");
 });
 $("closecreate").addEventListener("click", () => $("create").classList.add("hidden"));
+async function lookupCvr(num) {
+  const vat = String(num || "").replace(/[^0-9]/g, "");
+  if (vat.length !== 8) throw new Error("CVR skal være 8 cifre.");
+  const url = "https://cvrapi.dk/api?country=dk&version=6&vat=" + vat;
+  const res = await fetch(url);
+  const data = await res.json();
+  if (!data || data.error || !data.name) throw new Error(data.error || "Ikke fundet i CVR.");
+  const zip = String(data.zipcode || data.zip || "");
+  const city = data.city || "";
+  const addr = data.address || data.street || "";
+  return {
+    name: data.name,
+    address: addr,
+    zip: zip,
+    city: city,
+    phone: data.phone || "",
+  };
+}
+
+if ($("cvrbtn")) {
+  $("cvrbtn").addEventListener("click", async () => {
+    try {
+      $("cmsg").textContent = "Slår op i CVR…";
+      const f = await lookupCvr($("cvr").value);
+      $("cname").value = f.name;
+      $("caddr").value = f.address;
+      if ($("czip")) $("czip").value = f.zip;
+      $("ccity").value = f.city;
+      if ($("cphone")) $("cphone").value = f.phone;
+      $("cmsg").textContent = "Hentet fra CVR.";
+    } catch (err) {
+      $("cmsg").textContent = err.message;
+      alert(err.message);
+    }
+  });
+}
+if ($("cvrupd")) {
+  $("cvrupd").addEventListener("click", async () => {
+    try {
+      const f = await lookupCvr(currentId);
+      $("ename").value = f.name;
+      $("eaddr").value = f.address;
+      if ($("ezip")) $("ezip").value = f.zip;
+      $("ecity").value = f.city;
+      $("ephone").value = f.phone;
+      alert("Adresse hentet fra CVR. Tryk Gem og send.");
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+}
+
 $("createbtn").addEventListener("click", async () => {
   if (!db) {
     $("cmsg").textContent = "Ikke koblet på databasen.";
