@@ -144,3 +144,7 @@ preview { background:#1b1713;color:#f0d9a8;padding:10px;border-radius:10px;font-
 .filebtn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
 .studio-bar input[type=number] { width: 58px; background: #1c1814; color: #fff; border: 1px solid #3a332b; }
 .tab.on { background: #c9a36a; color: #14110e; border-color: #c9a36a; font-weight: 700; }
+.studio-bar { display: flex; flex-wrap: nowrap; align-items: center; }
+.studio-bar .go { background: #1f7a3a !important; color: #fff !important; }
+input[hidden] { display: none !important; }
+.studio-bar input[type=number] { width: 90px !important; min-width: 90px; }

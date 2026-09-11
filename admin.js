@@ -506,6 +506,8 @@ if ($("sbg")) {
     $("stitle").textContent = "Baggrund klar — send til TV";
   });
 }
+if ($("sscanbtn") && $("sscan")) $("sscanbtn").addEventListener("click", () => $("sscan").click());
+if ($("sbgbtn") && $("sbg")) $("sbgbtn").addEventListener("click", () => $("sbg").click());
 if ($("sscan")) {
   $("sscan").addEventListener("change", async (e) => {
     const f = e.target.files && e.target.files[0];

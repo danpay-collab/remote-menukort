@@ -104,9 +104,11 @@
       <button type="button" class="tab" data-scr="3">Skærm 3</button>
       <button type="button" class="tab" data-scr="4">Skærm 4</button>
       <button type="button" class="tab" data-scr="5">Skærm 5</button>
-      <label>Px <input id="spx" type="number" value="1920" style="width:64px" />×<input id="spy" type="number" value="1080" style="width:64px" /></label>
-      <label class="filebtn">Scan menukort<input type="file" id="sscan" accept="image/*" /></label>
-      <label class="filebtn">Baggrund<input type="file" id="sbg" accept="image/*" /></label>
+      <label>Px <input id="spx" type="number" value="1920" style="width:90px" /> × <input id="spy" type="number" value="1080" style="width:90px" /></label>
+      <button type="button" class="ghost" id="sscanbtn">Scan menukort</button>
+      <input type="file" id="sscan" accept="image/*" hidden />
+      <button type="button" class="ghost" id="sbgbtn">Baggrund</button>
+      <input type="file" id="sbg" accept="image/*" hidden />
       <button type="button" class="ghost" id="sview">Vis menukort</button>
       <button type="button" class="go" id="ssave">Send til TV</button>
       <button type="button" class="ghost" id="sclose">Luk</button>
