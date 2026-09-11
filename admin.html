@@ -20,6 +20,7 @@
         <label>CVR eller kundenummer (valgfrit) <input id="cvr" placeholder="kan udfyldes senere" /></label>
         <label>Firmanavn / pizzeria <input id="cname" /></label>
         <label>Adresse <input id="caddr" /></label>
+        <label>Postnr. <input id="czip" maxlength="4" placeholder="5471" /></label>
         <label>By <input id="ccity" /></label>
         <label>Landsdel
           <select id="cregion">
@@ -53,6 +54,7 @@
         <div id="preview" class="preview"></div>
         <label>Firmanavn <input id="ename" /></label>
         <label>Adresse <input id="eaddr" /></label>
+        <label>Postnr. <input id="ezip" maxlength="4" placeholder="5471" /></label>
         <label>By <input id="ecity" /></label>
         <label>Landsdel
           <select id="eregion">
@@ -73,6 +75,7 @@
         <div class="row-between">
           <h3>Retter</h3>
           <button type="button" class="ghost" id="add">+ Tilføj menu</button>
+          <button type="button" class="ghost" id="loadbopos">Indlæs BoPos-kort</button>
         </div>
         <div id="items"></div>
         <div class="actions">
@@ -112,6 +115,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="firebase-config.js"></script>
+  <script src="bopos-menu.js"></script>
   <script src="admin.js"></script>
 </body>
 </html>

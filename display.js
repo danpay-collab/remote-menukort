@@ -1,5 +1,5 @@
 const params = new URLSearchParams(location.search);
-const CUSTOMER_ID = params.get("id") || "odense";
+const CUSTOMER_ID = params.get("id") || "16067504";
 const SCREEN_ID = params.get("screen") || "tv-1";
 
 function tickClock() {
@@ -9,52 +9,66 @@ function tickClock() {
 }
 
 function render(data) {
-  document.getElementById("venue").textContent = data.venue || data.name || "Dagens kort";
-  document.getElementById("subtitle").textContent = data.subtitle || data.city || "";
-  document.getElementById("note").textContent = data.footerNote || "";
-  const list = document.getElementById("list");
-  list.innerHTML = "";
-  (data.items || []).filter((i) => i.visible !== false).forEach((i) => {
-    const el = document.createElement("article");
-    el.className = "item";
-    el.innerHTML = `<div><h2></h2><p></p></div><div class="price"></div>`;
-    el.querySelector("h2").textContent = i.name || "";
-    el.querySelector("p").textContent = i.desc || "";
-    el.querySelector(".price").textContent = i.price ? i.price + ",-" : "";
-    list.appendChild(el);
+  document.getElementById("venue").textContent = data.venue || data.name || "Menukort";
+  const board = document.getElementById("board");
+  board.innerHTML = "";
+  const sections = data.sections && data.sections.length
+    ? data.sections
+    : [{ title: "", items: (data.items || []).map((i, n) => ({ ...i, num: String(n + 1) })) }];
+  const mid = Math.ceil(sections.length / 2) || 1;
+  const cols = [sections.slice(0, mid), sections.slice(mid)];
+  cols.forEach((col) => {
+    const wrap = document.createElement("div");
+    col.forEach((sec) => {
+      const box = document.createElement("section");
+      box.className = "sec" + (sec.box ? " box" : "");
+      const h = document.createElement("h2");
+      h.textContent = sec.title || "";
+      box.appendChild(h);
+      if (sec.note) {
+        const n = document.createElement("p");
+        n.className = "desc";
+        n.textContent = sec.note;
+        box.appendChild(n);
+      }
+      (sec.items || []).forEach((it) => {
+        const el = document.createElement("article");
+        el.className = "row";
+        el.innerHTML = `<div class="num"></div><div><div class="line"><span class="name"></span></div><p class="desc"></p></div><div class="price"></div>`;
+        el.querySelector(".num").textContent = it.num || "";
+        el.querySelector(".name").textContent = it.name || "";
+        el.querySelector(".desc").textContent = it.desc || "";
+        el.querySelector(".price").textContent = it.price ? it.price + ",-" : "";
+        if (it.badge) {
+          const b = document.createElement("span");
+          b.className = "badge";
+          b.textContent = it.badge;
+          el.querySelector(".line").appendChild(b);
+        }
+        box.appendChild(el);
+      });
+      wrap.appendChild(box);
+    });
+    board.appendChild(wrap);
   });
   const t = document.getElementById("ticker");
-  const text = (data.ticker || " ").trim();
-  t.innerHTML = "";
-  const span = document.createElement("span");
-  span.textContent = text + "   •   " + text + "   •   " + text;
-  t.appendChild(span);
+  const text = (data.ticker || "").trim() || " ";
+  t.textContent = text + "   •   " + text + "   •   " + text;
 }
 
 const cfg = window.firebaseConfig;
-if (!cfg || cfg.apiKey === "INDSÆT") {
-  document.getElementById("subtitle").textContent = "Firebase-nøgler mangler i firebase-config.js";
-} else {
+if (cfg && cfg.apiKey !== "INDSÆT") {
   firebase.initializeApp(cfg);
   const db = firebase.firestore();
   const ref = db.collection("customers").doc(CUSTOMER_ID);
-  ref.onSnapshot((snap) => {
-    if (snap.exists) render(snap.data());
-    else document.getElementById("subtitle").textContent = "Ukendt kunde: " + CUSTOMER_ID;
-  });
+  ref.onSnapshot((snap) => { if (snap.exists) render(snap.data()); });
   async function beat() {
     await ref.set({
-      screens: {
-        [SCREEN_ID]: {
-          label: "Skærm 1",
-          lastSeen: firebase.firestore.FieldValue.serverTimestamp(),
-        },
-      },
+      screens: { [SCREEN_ID]: { label: "Skærm 1", lastSeen: firebase.firestore.FieldValue.serverTimestamp() } },
     }, { merge: true });
   }
   beat();
   setInterval(beat, 15000);
 }
-
 tickClock();
 setInterval(tickClock, 1000);

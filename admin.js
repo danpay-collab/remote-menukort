@@ -167,6 +167,7 @@ async function openCustomer(id) {
   $("pcity").textContent = "CVR " + id;
   $("ename").value = c.name || "";
   $("eaddr").value = c.address || "";
+  $("ezip").value = c.zip || "";
   $("ecity").value = c.city || "";
   $("eregion").value = REGIONS.includes(c.region) ? c.region : "Fyn";
   $("escreens").value = c.screenCount || 1;
@@ -241,6 +242,7 @@ $("createbtn").addEventListener("click", async () => {
     await db.collection("customers").doc(cvr).set({
       name: $("cname").value || "Ny kunde",
       address: $("caddr").value || "",
+      zip: $("czip") ? $("czip").value : "",
       city: $("ccity").value || "",
       region: $("cregion").value,
       screenCount: Number($("cscreens").value || 1),
@@ -315,6 +317,15 @@ function openStudio() {
   paintStudio();
 }
 
+$("loadbopos").addEventListener("click", async () => {
+  if (!db || !currentId || !window.BOPOS_MENU) return;
+  await db.collection("customers").doc(currentId).set({
+    venue: window.BOPOS_MENU.venue,
+    ticker: window.BOPOS_MENU.ticker,
+    sections: window.BOPOS_MENU.sections,
+  }, { merge: true });
+  alert("BoPos-menukortet er sendt til skærmen.");
+});
 $("add").addEventListener("click", openStudio);
 $("sadd").addEventListener("click", () => {
   items.push({ name: "", desc: "", price: "", visible: true });
@@ -338,6 +349,7 @@ $("save").addEventListener("click", async () => {
   await db.collection("customers").doc(currentId).set({
     name: $("ename").value,
     address: $("eaddr").value,
+    zip: $("ezip") ? $("ezip").value : "",
     city: $("ecity").value,
     region: $("eregion").value,
     screenCount: Number($("escreens").value || 1),

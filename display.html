@@ -4,25 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Skærmkort</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="board.css" />
 </head>
-<body class="display">
-  <div class="frame">
-    <header class="top">
-      <div>
-        <p class="eyebrow" id="clock">--:--</p>
-        <h1 id="venue">Dagens kort</h1>
-        <p class="sub" id="subtitle"></p>
-      </div>
-      <div class="badge">LIVE</div>
-    </header>
-    <main id="list" class="list"></main>
-    <p class="note" id="note"></p>
-  </div>
-  <div class="ticker-wrap">
-    <div class="flames"></div>
-    <div class="ticker" id="ticker"></div>
-  </div>
+<body class="board">
+  <header class="board-head">
+    <div>
+      <p id="clock"></p>
+      <h1 id="venue">Menukort</h1>
+    </div>
+    <span class="live">LIVE</span>
+  </header>
+  <main id="board" class="board-grid"></main>
+  <footer class="board-tick"><span id="ticker"></span></footer>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="firebase-config.js"></script>
