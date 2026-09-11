@@ -139,8 +139,19 @@ function addRow(c) {
   $("list").appendChild(row);
 }
 
+async function geocode(zip, city, address) {
+  const q = [address, zip, city, "Danmark"].filter(Boolean).join(", ");
+  if (!q.replace("Danmark", "").trim()) return null;
+  const url = "https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=dk&q=" + encodeURIComponent(q);
+  const res = await fetch(url, { headers: { "Accept": "application/json" } });
+  const arr = await res.json();
+  if (!arr || !arr[0]) return null;
+  return { lat: Number(arr[0].lat), lng: Number(arr[0].lon) };
+}
+
 function drawItems() {
   const box = $("items");
+  if (!box) return;
   box.innerHTML = "";
   items.forEach((item, idx) => {
     const wrap = document.createElement("div");
@@ -377,11 +388,15 @@ $("save").addEventListener("click", async () => {
   $("msg").textContent = "Gemmer…";
   try {
     const venue = $("venue").value || $("ename").value || "Menukort";
-    await db.collection("customers").doc(currentId).set({
+    const zip = $("ezip") ? $("ezip").value : "";
+    const city = $("ecity").value;
+    const address = $("eaddr").value;
+    const pos = await geocode(zip, city, address);
+    const payload = {
       name: $("ename").value,
-      address: $("eaddr").value,
-      zip: $("ezip") ? $("ezip").value : "",
-      city: $("ecity").value,
+      address,
+      zip,
+      city,
       region: $("eregion").value,
       screenCount: Number($("escreens").value || 1),
       phone: $("ephone").value,
@@ -389,7 +404,12 @@ $("save").addEventListener("click", async () => {
       ticker: $("ticker").value,
       footerNote: $("footerNote").value,
       items: items || [],
-    }, { merge: true });
+    };
+    if (pos) {
+      payload.lat = pos.lat;
+      payload.lng = pos.lng;
+    }
+    await db.collection("customers").doc(currentId).set(payload, { merge: true });
     $("msg").textContent = "Gemt og sendt.";
     alert("Gemt. Genindlæs TV-siden hvis den ikke skifter med det samme.");
   } catch (err) {
