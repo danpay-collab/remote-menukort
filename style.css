@@ -61,6 +61,7 @@ body.admin { background: #ece7df; color: #1b1713; font-family: system-ui, sans-s
   position: absolute; right: 16px; top: 16px; bottom: 16px; width: min(420px, 92vw);
   background: #fff; border-radius: 14px; padding: 16px; overflow: auto;
   box-shadow: 0 12px 40px rgba(0,0,0,.18);
+  z-index: 5000;
 }
 .hidden { display: none; }
 .close { float: right; border: 0; background: #f3efe8; border-radius: 8px; padding: 6px 10px; cursor: pointer; }
@@ -89,3 +90,9 @@ h2, h3 { margin: 8px 0; }
 
 .region{margin:14px 0 6px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#cbbba6}
 select{width:100%;margin-top:4px;padding:10px 12px;border-radius:8px;border:1px solid #d7cfc3;font:inherit}
+
+.side-form{background:#2a241e;border-radius:12px;padding:12px;margin:0 0 14px}
+.side-form h2{margin:0 0 8px;font-size:16px}
+.side-form label{color:#cbbba6}
+.side-form input,.side-form select{background:#1b1713;color:#f4efe6;border-color:#3a3229}
+.side-form .primary{width:100%;margin-top:8px}
