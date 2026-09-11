@@ -318,13 +318,18 @@ function openStudio() {
 }
 
 $("loadbopos").addEventListener("click", async () => {
-  if (!db || !currentId || !window.BOPOS_MENU) return;
-  await db.collection("customers").doc(currentId).set({
-    venue: window.BOPOS_MENU.venue,
-    ticker: window.BOPOS_MENU.ticker,
-    sections: window.BOPOS_MENU.sections,
-  }, { merge: true });
-  alert("BoPos-menukortet er sendt til skærmen.");
+  if (!db || !currentId) { alert("Vælg kunden først."); return; }
+  if (!window.BOPOS_MENU) { alert("bopos-menu.js mangler på GitHub."); return; }
+  try {
+    await db.collection("customers").doc(currentId).set({
+      venue: window.BOPOS_MENU.venue,
+      ticker: window.BOPOS_MENU.ticker,
+      sections: window.BOPOS_MENU.sections,
+    }, { merge: true });
+    alert("BoPos-menukortet er sendt. Åbn display.html?id=" + currentId);
+  } catch (err) {
+    alert("Kunne ikke sende kortet: " + err.message);
+  }
 });
 $("add").addEventListener("click", openStudio);
 $("sadd").addEventListener("click", () => {
@@ -345,21 +350,32 @@ $("ssave").addEventListener("click", () => {
   $("studio").classList.add("hidden");
 });
 $("save").addEventListener("click", async () => {
-  if (!db || !currentId) return;
-  await db.collection("customers").doc(currentId).set({
-    name: $("ename").value,
-    address: $("eaddr").value,
-    zip: $("ezip") ? $("ezip").value : "",
-    city: $("ecity").value,
-    region: $("eregion").value,
-    screenCount: Number($("escreens").value || 1),
-    phone: $("ephone").value,
-    venue: $("venue").value,
-    ticker: $("ticker").value,
-    footerNote: $("footerNote").value,
-    items,
-  }, { merge: true });
-  $("msg").textContent = "Sendt til skærmen.";
+  if (!db || !currentId) {
+    alert("Ingen kunde er valgt.");
+    return;
+  }
+  $("msg").textContent = "Gemmer…";
+  try {
+    const venue = $("venue").value || $("ename").value || "Menukort";
+    await db.collection("customers").doc(currentId).set({
+      name: $("ename").value,
+      address: $("eaddr").value,
+      zip: $("ezip") ? $("ezip").value : "",
+      city: $("ecity").value,
+      region: $("eregion").value,
+      screenCount: Number($("escreens").value || 1),
+      phone: $("ephone").value,
+      venue: venue,
+      ticker: $("ticker").value,
+      footerNote: $("footerNote").value,
+      items: items || [],
+    }, { merge: true });
+    $("msg").textContent = "Gemt og sendt.";
+    alert("Gemt. Genindlæs TV-siden hvis den ikke skifter med det samme.");
+  } catch (err) {
+    $("msg").textContent = "Fejl: " + err.message;
+    alert("Kunne ikke gemme: " + err.message);
+  }
 });
 
 start();
