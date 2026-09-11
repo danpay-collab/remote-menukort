@@ -73,7 +73,7 @@ function render(data) {
         el.querySelector(".name").textContent = it.name || "";
         el.querySelector(".desc").textContent = it.desc || "";
         const base = Number(String(it.price || "").replace(",", "."));
-        const add = (isNight(data.nightFrom || "22:00", data.nightTo || "05:00") ? Number(data.nightAdd || 0) : 0);
+        const add = (isNight(data.nightFrom || "22:00", data.nightTo || "05:00") ? Number(it.nightAdd || 0) : 0);
         const shown = (Number.isFinite(base) && it.price !== "" && it.price != null)
           ? String(base + add).replace(/\.0$/, "") + ",-"
           : (it.price ? it.price + ",-" : "");

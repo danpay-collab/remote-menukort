@@ -377,15 +377,24 @@ function paintStudio() {
         <div class="prod-btns">
           <button type="button" data-add>+</button>
           <button type="button" data-del>−</button>
+          <button type="button" data-night>Natpris</button>
+          <input class="pnight" placeholder="+ kr nat" />
         </div>`;
       row.querySelector(".num").value = it.num || "";
       row.querySelector(".pname").value = it.name || "";
       row.querySelector(".pprice").value = it.price || "";
       row.querySelector(".pdesc").value = it.desc || "";
+      row.querySelector(".pnight").value = it.nightAdd || "";
       row.querySelector(".num").addEventListener("input", (e) => { sections[si].items[ii].num = e.target.value; });
       row.querySelector(".pname").addEventListener("input", (e) => { sections[si].items[ii].name = e.target.value; });
       row.querySelector(".pprice").addEventListener("input", (e) => { sections[si].items[ii].price = e.target.value; });
       row.querySelector(".pdesc").addEventListener("input", (e) => { sections[si].items[ii].desc = e.target.value; });
+      row.querySelector(".pnight").addEventListener("input", (e) => { sections[si].items[ii].nightAdd = e.target.value; });
+      row.querySelector("[data-night]").addEventListener("click", () => {
+        const box = row.querySelector(".pnight");
+        box.style.display = "inline-block";
+        box.focus();
+      });
       row.querySelector("[data-add]").addEventListener("click", () => {
         sections[si].items.splice(ii + 1, 0, { num: "", name: "", desc: "", price: "" });
         paintStudio();
@@ -417,7 +426,6 @@ async function openStudio() {
   if ($("sc1")) $("sc1").checked = on.indexOf(1) >= 0;
   if ($("sc2")) $("sc2").checked = on.indexOf(2) >= 0;
   if ($("sc3")) $("sc3").checked = on.indexOf(3) >= 0;
-  if ($("snat")) $("snat").value = c.nightAdd || 0;
   if ($("snatfra")) $("snatfra").value = c.nightFrom || "22:00";
   if ($("snattil")) $("snattil").value = c.nightTo || "05:00";
   paintStudio();
@@ -477,7 +485,6 @@ $("ssave").addEventListener("click", async () => {
       pxW: Number($("spx") && $("spx").value) || 1920,
       pxH: Number($("spy") && $("spy").value) || 1080,
       tvScreens: tvs.length ? tvs : [1],
-      nightAdd: Number($("snat") && $("snat").value) || 0,
       nightFrom: ($("snatfra") && $("snatfra").value) || "22:00",
       nightTo: ($("snattil") && $("snattil").value) || "05:00",
     };
