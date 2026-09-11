@@ -209,25 +209,35 @@ $("newbtn").addEventListener("click", () => {
 });
 $("closecreate").addEventListener("click", () => $("create").classList.add("hidden"));
 $("createbtn").addEventListener("click", async () => {
-  if (!db) return;
+  if (!db) {
+    $("cmsg").textContent = "Ikke koblet på databasen.";
+    return;
+  }
   let cvr = ($("cvr").value || "").trim();
   if (!cvr) cvr = "kunde-" + Date.now();
-  await db.collection("customers").doc(cvr).set({
-    name: $("cname").value,
-    address: $("caddr").value,
-    city: $("ccity").value,
-    region: $("cregion").value,
-    screenCount: Number($("cscreens").value || 1),
-    phone: $("cphone").value,
-    lat: Number($("clat").value) || null,
-    lng: Number($("clng").value) || null,
-    venue: $("cname").value,
-    ticker: "",
-    footerNote: "",
-    items: [],
-    screens: {},
-  }, { merge: true });
-  $("cmsg").textContent = "Kunden er oprettet. TV: display.html?id=" + cvr;
+  $("cmsg").textContent = "Gemmer…";
+  try {
+    await db.collection("customers").doc(cvr).set({
+      name: $("cname").value || "Ny kunde",
+      address: $("caddr").value || "",
+      city: $("ccity").value || "",
+      region: $("cregion").value,
+      screenCount: Number($("cscreens").value || 1),
+      phone: $("cphone").value || "",
+      lat: null,
+      lng: null,
+      venue: $("cname").value || "Dagens kort",
+      ticker: "",
+      footerNote: "",
+      items: [],
+      screens: {},
+    }, { merge: true });
+    $("cmsg").textContent = "Gemt. TV: display.html?id=" + cvr;
+    alert("Kunden er gemt: " + cvr);
+  } catch (err) {
+    $("cmsg").textContent = "Kunne ikke gemme: " + err.message;
+    alert("Kunne ikke gemme: " + err.message);
+  }
 });
 
 $("seed").addEventListener("click", async () => {

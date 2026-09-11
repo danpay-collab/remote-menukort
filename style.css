@@ -45,7 +45,7 @@ body.display {
 @keyframes tick { to { transform: translateX(-100%); } }
 
 body.admin { background: #ece7df; color: #1b1713; font-family: system-ui, sans-serif; }
-.shell { display: grid; grid-template-columns: 280px 1fr; height: 100%; }
+.shell { display: grid; grid-template-columns: 420px 1fr; height: 100%; }
 .side { padding: 20px 16px; background: #1b1713; color: #f4efe6; overflow: auto; }
 .side h1 { margin: 0 0 8px; }
 .lead { color: #cbbba6; font-size: 14px; }
