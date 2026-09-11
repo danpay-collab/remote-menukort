@@ -1,0 +1,84 @@
+:root {
+  --bg: #14110e;
+  --ink: #f4efe6;
+  --muted: #b7aa98;
+  --gold: #c9a36a;
+  --line: #3a3229;
+  --green: #3dba7a;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body.display {
+  background: radial-gradient(1200px 600px at 20% 0%, #2a2218, var(--bg));
+  color: var(--ink);
+  font-family: Georgia, "Times New Roman", serif;
+  overflow: hidden;
+}
+.frame { height: calc(100% - 72px); padding: 36px 48px 12px; display: flex; flex-direction: column; }
+.top { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid var(--line); padding-bottom: 16px; }
+.eyebrow { margin: 0; letter-spacing: .16em; text-transform: uppercase; font-family: system-ui, sans-serif; font-size: 14px; color: var(--gold); }
+.top h1 { margin: 6px 0 0; font-size: 48px; font-weight: 600; }
+.sub { margin: 4px 0 0; color: var(--muted); font-style: italic; }
+.badge {
+  font-family: system-ui, sans-serif; border: 1px solid var(--green); color: var(--green);
+  padding: 6px 10px; border-radius: 999px; font-size: 12px; letter-spacing: .12em;
+}
+.list { flex: 1; display: grid; align-content: start; gap: 8px; margin-top: 22px; overflow: hidden; }
+.item { display: grid; grid-template-columns: 1fr auto; gap: 8px 24px; padding: 10px 0; border-bottom: 1px dashed #2e281f; }
+.item h2 { margin: 0; font-size: 28px; font-weight: 600; }
+.item p { margin: 4px 0 0; color: var(--muted); font-size: 16px; }
+.price { font-family: system-ui, sans-serif; font-size: 26px; color: var(--gold); white-space: nowrap; }
+.note { color: var(--muted); font-size: 14px; margin: 8px 0 0; }
+.ticker-wrap { position: relative; height: 72px; }
+.flames {
+  height: 18px;
+  background: linear-gradient(90deg, #4a1c08, #c45a12, #e8b33a, #c45a12, #4a1c08);
+  background-size: 200% 100%;
+  animation: fire 3s linear infinite;
+}
+@keyframes fire { to { background-position: 200% 0; } }
+.ticker {
+  height: 54px; background: #0e0c0a; color: #f0d9a8; display: flex; align-items: center;
+  overflow: hidden; font-family: system-ui, sans-serif; font-size: 22px; white-space: nowrap;
+}
+.ticker span { display: inline-block; padding-left: 100%; animation: tick 28s linear infinite; }
+@keyframes tick { to { transform: translateX(-100%); } }
+
+body.admin { background: #ece7df; color: #1b1713; font-family: system-ui, sans-serif; }
+.shell { display: grid; grid-template-columns: 280px 1fr; height: 100%; }
+.side { padding: 20px 16px; background: #1b1713; color: #f4efe6; overflow: auto; }
+.side h1 { margin: 0 0 8px; }
+.lead { color: #cbbba6; font-size: 14px; }
+.cust-list { display: flex; flex-direction: column; gap: 6px; margin-top: 16px; }
+.cust {
+  text-align: left; background: #2a241e; color: inherit; border: 0; border-radius: 10px;
+  padding: 10px; display: flex; gap: 10px; align-items: center; cursor: pointer; width: 100%;
+}
+.cust small { color: #b7aa98; }
+.main { position: relative; }
+#map { height: 100%; width: 100%; }
+.panel {
+  position: absolute; right: 16px; top: 16px; bottom: 16px; width: min(420px, 92vw);
+  background: #fff; border-radius: 14px; padding: 16px; overflow: auto;
+  box-shadow: 0 12px 40px rgba(0,0,0,.18);
+}
+.hidden { display: none; }
+.close { float: right; border: 0; background: #f3efe8; border-radius: 8px; padding: 6px 10px; cursor: pointer; }
+label { display: block; margin: 8px 0; font-size: 13px; color: #5c5348; }
+input {
+  width: 100%; margin-top: 4px; padding: 10px 12px; border-radius: 8px;
+  border: 1px solid #d7cfc3; font: inherit;
+}
+.item-edit { display: grid; grid-template-columns: 1fr 1fr 70px auto; gap: 6px; margin: 6px 0; }
+.row-between { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
+h2, h3 { margin: 8px 0; }
+.muted { color: #6a6156; }
+.primary { background: #1b1713; color: #fff; border: 0; border-radius: 10px; padding: 12px 16px; font-weight: 600; cursor: pointer; }
+.ghost, .tiny { background: #fff; border: 1px solid #d7cfc3; border-radius: 8px; padding: 8px 10px; cursor: pointer; }
+.screens { display: flex; flex-direction: column; gap: 8px; margin: 10px 0; }
+.screen-row { display: flex; justify-content: space-between; padding: 8px 10px; background: #f7f3ec; border-radius: 8px; font-size: 14px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 8px; }
+.dot.ok { background: #3dba7a; }
+.dot.bad { background: #d4452a; }
+.tv-url { font-size: 12px; word-break: break-all; }
+.actions { display: flex; gap: 12px; align-items: center; margin-top: 12px; }

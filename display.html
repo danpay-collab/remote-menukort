@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Skærmkort</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="display">
+  <div class="frame">
+    <header class="top">
+      <div>
+        <p class="eyebrow" id="clock">--:--</p>
+        <h1 id="venue">Dagens kort</h1>
+        <p class="sub" id="subtitle"></p>
+      </div>
+      <div class="badge">LIVE</div>
+    </header>
+    <main id="list" class="list"></main>
+    <p class="note" id="note"></p>
+  </div>
+  <div class="ticker-wrap">
+    <div class="flames" aria-hidden="true"></div>
+    <div class="ticker" id="ticker"></div>
+  </div>
+  <script src="display.js"></script>
+</body>
+</html>

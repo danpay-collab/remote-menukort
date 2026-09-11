@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Skærmkort — Danmark</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="admin">
+  <div class="shell">
+    <aside class="side">
+      <h1>Skærmkort</h1>
+      <p class="lead">Klik en prik. Ret lysavis og menukort. Kun den kunde får det.</p>
+      <div id="list" class="cust-list"></div>
+    </aside>
+    <div class="main">
+      <div id="map"></div>
+      <section class="panel hidden" id="panel">
+        <button type="button" class="close" id="close">Luk</button>
+        <h2 id="pname"></h2>
+        <p id="pcity" class="muted"></p>
+        <div id="pscreens" class="screens"></div>
+        <p class="tv-url muted" id="tvurl"></p>
+        <label>Overskrift <input id="venue" /></label>
+        <label>Lysavis <input id="ticker" /></label>
+        <label>Note <input id="footerNote" /></label>
+        <div class="row-between">
+          <h3>Retter</h3>
+          <button type="button" class="ghost" id="add">+ Tilføj</button>
+        </div>
+        <div id="items"></div>
+        <div class="actions">
+          <button type="button" class="primary" id="save">Send til skærmen</button>
+          <span id="msg"></span>
+        </div>
+      </section>
+    </div>
+  </div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

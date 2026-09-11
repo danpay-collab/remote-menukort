@@ -1,0 +1,76 @@
+{
+  "customers": {
+    "aalborg": {
+      "name": "Nordkysten Café",
+      "city": "Aalborg",
+      "phone": "",
+      "lat": 57.048,
+      "lng": 9.919,
+      "venue": "Dagens kort",
+      "subtitle": "Priser i DKK",
+      "ticker": "Velkommen • Dagens suppe 69,- • Happy hour 16–18",
+      "footerNote": "Spørg personalet om allergener",
+      "items": [
+        {"id": "1", "name": "Classic Burger", "desc": "Oksekød, cheddar, salat", "price": "129", "visible": true},
+        {"id": "2", "name": "Ribeye Steak", "desc": "300 g, pommes, grønt", "price": "269", "visible": true}
+      ]
+    },
+    "aarhus": {
+      "name": "Havnegrill Aarhus",
+      "city": "Aarhus",
+      "phone": "",
+      "lat": 56.157,
+      "lng": 10.210,
+      "venue": "Grillkort",
+      "subtitle": "Fra grillen",
+      "ticker": "Dagens steak • Ny øl på fad",
+      "footerNote": "",
+      "items": [
+        {"id": "1", "name": "Bøfsandwich", "desc": "Med bløde løg", "price": "99", "visible": true}
+      ]
+    },
+    "esbjerg": {
+      "name": "Vesterhavet",
+      "city": "Esbjerg",
+      "phone": "",
+      "lat": 55.477,
+      "lng": 8.452,
+      "venue": "Fisk og husets retter",
+      "subtitle": "",
+      "ticker": "Fisken kommer ind om formiddagen",
+      "footerNote": "",
+      "items": [
+        {"id": "1", "name": "Fiskefilet", "desc": "Remoulade og citron", "price": "119", "visible": true}
+      ]
+    },
+    "koebenhavn": {
+      "name": "Kødbyen Bord",
+      "city": "København",
+      "phone": "",
+      "lat": 55.676,
+      "lng": 12.568,
+      "venue": "Aftenkort",
+      "subtitle": "",
+      "ticker": "Velkommen til Kødbyen",
+      "footerNote": "",
+      "items": [
+        {"id": "1", "name": "Smashburger", "desc": "Dobbelt bøf", "price": "139", "visible": true}
+      ]
+    },
+    "odense": {
+      "name": "Test — dit TV",
+      "city": "Odense / Fyn",
+      "phone": "",
+      "lat": 55.403,
+      "lng": 10.402,
+      "venue": "Dagens kort",
+      "subtitle": "Testskærm",
+      "ticker": "Dette er testkunden på Fyn • Ret prisen i admin",
+      "footerNote": "Åbn display.html?id=odense på TV'et",
+      "items": [
+        {"id": "1", "name": "Testburger", "desc": "Ret den her fra admin", "price": "89", "visible": true},
+        {"id": "2", "name": "Dagens ret", "desc": "Skifter når du gemmer", "price": "129", "visible": true}
+      ]
+    }
+  }
+}
