@@ -1,6 +1,6 @@
 const params = new URLSearchParams(location.search);
 const CUSTOMER_ID = params.get("id") || "16067504";
-const SCREEN_ID = params.get("screen") || "tv-1";
+const SCREEN_ID = params.get("screen") || "1";
 
 function tickClock() {
   document.getElementById("clock").textContent = new Date().toLocaleTimeString("da-DK", {
@@ -39,7 +39,11 @@ function render(data) {
   document.documentElement.style.fontSize = (15 * scale) + "px";
   board.style.fontSize = (12 * scale) + "px";
   board.innerHTML = "";
-  let sections = (data.sections && data.sections.length) ? data.sections : [];
+  const pack = data.boardsByScreen && data.boardsByScreen[String(SCREEN_ID)];
+  let sections = (pack && pack.sections && pack.sections.length)
+    ? pack.sections
+    : ((data.sections && data.sections.length) ? data.sections : []);
+  if (pack && pack.pxW) data.pxW = pack.pxW;
   const hasSecItems = sections.some((s) => s && s.items && s.items.length);
   const flat = (data.items || []).filter((i) => i && (i.name || i.desc || i.price));
   if (!hasSecItems && flat.length) {

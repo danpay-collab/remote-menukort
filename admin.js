@@ -4,6 +4,8 @@ let db = null;
 let currentId = null;
 let items = [];
 let sections = [];
+let boardsByScreen = {};
+let activeScreen = "1";
 let map, markers = {};
 let placeMode = false;
 
@@ -426,30 +428,55 @@ function paintStudio() {
   });
 }
 
+function stashScreen() {
+  boardsByScreen[activeScreen] = {
+    sections: JSON.parse(JSON.stringify(sections || [])),
+    pxW: Number($("spx") && $("spx").value) || 1920,
+    pxH: Number($("spy") && $("spy").value) || 1080,
+  };
+}
+
+function applyScreen(n) {
+  activeScreen = String(n);
+  const b = boardsByScreen[activeScreen] || { sections: [], pxW: 1920, pxH: 1080 };
+  sections = JSON.parse(JSON.stringify(b.sections || []));
+  if ($("spx")) $("spx").value = b.pxW || 1920;
+  if ($("spy")) $("spy").value = b.pxH || 1080;
+  document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("on", t.getAttribute("data-scr") === activeScreen));
+  paintStudio();
+}
+
 async function openStudio() {
   if (!currentId || !db) return;
   const snap = await db.collection("customers").doc(currentId).get();
   const c = snap.exists ? snap.data() : {};
-  if (c.sections && c.sections.length) {
-    sections = JSON.parse(JSON.stringify(c.sections));
-  } else {
-    sections = [{ title: "BURGERS", items: [{ num: "1", name: "", desc: "", price: "" }] }];
+  boardsByScreen = JSON.parse(JSON.stringify(c.boardsByScreen || {}));
+  if (!boardsByScreen["1"]) {
+    boardsByScreen["1"] = {
+      sections: (c.sections && c.sections.length) ? c.sections : [],
+      pxW: c.pxW || 1920,
+      pxH: c.pxH || 1080,
+    };
   }
+  const on = c.tvScreens || [1];
+  ["1","2","3","4","5"].forEach((n) => {
+    const el = $("has" + n);
+    if (el) el.checked = on.indexOf(Number(n)) >= 0;
+  });
   $("studio").classList.remove("hidden");
   $("stitle").textContent = c.name || currentId;
-  if ($("spx")) $("spx").value = c.pxW || 1920;
-  if ($("spy")) $("spy").value = c.pxH || 1080;
-  const on = c.tvScreens || [1];
-  if ($("sc1")) $("sc1").checked = on.indexOf(1) >= 0;
-  if ($("sc2")) $("sc2").checked = on.indexOf(2) >= 0;
-  if ($("sc3")) $("sc3").checked = on.indexOf(3) >= 0;
-  if ($("snatfra")) $("snatfra").value = c.nightFrom || "22:00";
-  if ($("snattil")) $("snattil").value = c.nightTo || "05:00";
-  paintStudio();
+  if ($("scvr")) $("scvr").textContent = "CVR " + currentId;
+  applyScreen("1");
 }
 
 $("add").addEventListener("click", openStudio);
 if ($("viewmenu")) $("viewmenu").addEventListener("click", openStudio);
+document.querySelectorAll(".tab").forEach((t) => {
+  t.addEventListener("click", () => {
+    stashScreen();
+    applyScreen(t.getAttribute("data-scr"));
+  });
+});
 $("saddcol").addEventListener("click", () => {
   sections.push({ title: "", items: [{ num: "", name: "", desc: "", price: "" }] });
   paintStudio();
@@ -516,7 +543,7 @@ if ($("sscan")) {
 if ($("sview")) {
   $("sview").addEventListener("click", () => {
     if (!currentId) return;
-    window.open("display.html?id=" + currentId + "&screen=1", "_blank");
+    window.open("display.html?id=" + currentId + "&screen=" + activeScreen, "_blank");
   });
 }
 $("sclose").addEventListener("click", () => $("studio").classList.add("hidden"));
@@ -525,24 +552,17 @@ $("ssave").addEventListener("click", async () => {
   items = [];
   sections.forEach((s) => (s.items || []).forEach((it) => items.push({ ...it, visible: true })));
   try {
+    stashScreen();
     const tvs = [];
-    if ($("scon")) {
-      Array.from($("scon").selectedOptions).forEach((o) => tvs.push(Number(o.value)));
-    }
-    const pick = ($("scpick") && $("scpick").value) || "1";
-    const screenPx = {};
-    screenPx[pick] = {
-      w: Number($("spx") && $("spx").value) || 1920,
-      h: Number($("spy") && $("spy").value) || 1080,
-    };
+    ["1","2","3","4","5"].forEach((n) => { if ($("has"+n) && $("has"+n).checked) tvs.push(Number(n)); });
     const payload = {
-      sections,
+      sections: (boardsByScreen["1"] && boardsByScreen["1"].sections) || sections,
       items,
       venue: "Menukort",
       pxW: Number($("spx") && $("spx").value) || 1920,
       pxH: Number($("spy") && $("spy").value) || 1080,
       tvScreens: tvs.length ? tvs : [1],
-      screenPx,
+      boardsByScreen,
     };
     if (pendingBg) payload.bg = pendingBg;
     await db.collection("customers").doc(currentId).set(payload, { merge: true });

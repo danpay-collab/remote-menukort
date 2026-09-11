@@ -87,27 +87,26 @@
   </div>
   <div id="studio" class="studio hidden">
     <div class="studio-bar">
-      <strong>Menukort</strong>
-      <span id="stitle"></span>
+      <div class="who">
+        <strong>Menukort</strong>
+        <span id="stitle" class="firm"></span>
+        <small id="scvr"></small>
+      </div>
       <button type="button" class="ghost" id="saddcol">+ Ny kolonne</button>
-      <label>Skærm
-        <select id="scpick">
-          <option value="1">Skærm 1</option>
-          <option value="2">Skærm 2</option>
-          <option value="3">Skærm 3</option>
-        </select>
-      </label>
-      <label>Px B <input id="spx" type="number" value="1920" style="width:72px" /></label>
-      <label>Px H <input id="spy" type="number" value="1080" style="width:72px" /></label>
-      <label>På skærme
-        <select id="scon" multiple size="3">
-          <option value="1" selected>1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-        </select>
-      </label>
-      <label>Scan kort <input type="file" id="sscan" accept="image/*" /></label>
-      <label class="bg-lab">Baggrund <input type="file" id="sbg" accept="image/*" /></label>
+      <span class="labs">Skærme</span>
+      <label class="tick"><input type="checkbox" id="has1" checked />1</label>
+      <label class="tick"><input type="checkbox" id="has2" />2</label>
+      <label class="tick"><input type="checkbox" id="has3" />3</label>
+      <label class="tick"><input type="checkbox" id="has4" />4</label>
+      <label class="tick"><input type="checkbox" id="has5" />5</label>
+      <button type="button" class="tab on" data-scr="1">Skærm 1</button>
+      <button type="button" class="tab" data-scr="2">Skærm 2</button>
+      <button type="button" class="tab" data-scr="3">Skærm 3</button>
+      <button type="button" class="tab" data-scr="4">Skærm 4</button>
+      <button type="button" class="tab" data-scr="5">Skærm 5</button>
+      <label>Px <input id="spx" type="number" value="1920" style="width:64px" />×<input id="spy" type="number" value="1080" style="width:64px" /></label>
+      <label>Scan <input type="file" id="sscan" accept="image/*" /></label>
+      <label>Baggrund <input type="file" id="sbg" accept="image/*" /></label>
       <button type="button" class="ghost" id="sview">Vis menukort</button>
       <button type="button" class="primary" id="ssave">Send til TV</button>
       <button type="button" class="ghost" id="sclose">Luk</button>

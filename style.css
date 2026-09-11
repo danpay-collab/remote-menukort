@@ -129,3 +129,11 @@ preview { background:#1b1713;color:#f0d9a8;padding:10px;border-radius:10px;font-
 .prod .extra { display: none; width: 72px; }
 .prod.show-night .pnight, .prod.show-night .pnfrom, .prod.show-night .pnto { display: inline-block; }
 .prod.show-lunch .plunch, .prod.show-lunch .plfrom, .prod.show-lunch .plto { display: inline-block; }
+.studio-bar { flex-wrap: nowrap; align-items: center; gap: 8px; overflow-x: auto; white-space: nowrap; }
+.who { display: flex; flex-direction: column; line-height: 1.15; min-width: 120px; }
+.who strong { font-size: 15px; }
+.who .firm { color: #c9a36a; font-size: 13px; }
+.who small { color: #ddd; font-size: 11px; }
+.tab { background: transparent; color: #fff; border: 1px solid #555; border-radius: 8px; padding: 6px 8px; }
+.tab.on { border-color: #c9a36a; color: #c9a36a; }
+.tick { color: #fff; }
