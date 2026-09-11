@@ -563,6 +563,100 @@ if ($("sbg")) {
     $("stitle").textContent = "Baggrund klar — send til TV";
   });
 }
+let pendingXl = null;
+function normHead(s) {
+  return String(s || "").toLowerCase().replace(/\s+/g, " ").trim();
+}
+function colIndex(heads, names) {
+  for (let i = 0; i < heads.length; i++) {
+    const h = normHead(heads[i]);
+    if (names.some((n) => h === n || h.indexOf(n) >= 0)) return i;
+  }
+  return -1;
+}
+function guessPriceCount(rows, heads) {
+  const iAlm = colIndex(heads, ["alm"]);
+  const iDeep = colIndex(heads, ["deep"]);
+  const iFam = colIndex(heads, ["familie", "fam"]);
+  const iXl = colIndex(heads, ["xl"]);
+  const iXxl = colIndex(heads, ["xxl"]);
+  let three = 0, five = 0;
+  rows.slice(1).forEach((r) => {
+    if (iAlm >= 0 && r[iAlm] && iDeep >= 0 && r[iDeep] && iFam >= 0 && r[iFam]) three++;
+    if (iXl >= 0 && r[iXl] && iXxl >= 0 && r[iXxl]) five++;
+  });
+  if (five > 0) return 5;
+  if (three > 0) return 3;
+  return 1;
+}
+function openExcelWizard(rows) {
+  pendingXl = rows || [];
+  const heads = (rows[0] || []).map((h) => String(h || ""));
+  const g = guessPriceCount(rows, heads);
+  if ($("xlcount")) $("xlcount").value = String(g);
+  if ($("xllabs")) $("xllabs").value = g === 5 ? "Alm, Deep pan, Familie, XL, XXL" : (g === 3 ? "Alm, Deep pan, Familie" : "Pris");
+  if ($("xlhint")) $("xlhint").textContent = "Fandt " + Math.max(0, rows.length - 1) + " linjer. Vælg antal priser og læg ind.";
+  if ($("xlwiz")) $("xlwiz").classList.remove("hidden");
+}
+function applyExcelWizard() {
+  const rows = pendingXl || [];
+  if (!rows.length) return;
+  const heads = (rows[0] || []).map((h) => String(h || ""));
+  const n = Number($("xlcount") && $("xlcount").value) || 3;
+  const labels = (($("xllabs") && $("xllabs").value) || "Alm, Deep pan, Familie").split(",").map((s) => s.trim()).filter(Boolean);
+  const iCol = colIndex(heads, ["kolonne", "gruppe", "kategori"]);
+  const iNr = colIndex(heads, ["nr", "nummer", "no"]);
+  const iName = colIndex(heads, ["navn", "produkt", "ret"]);
+  const iDesc = colIndex(heads, ["beskrivelse", "tilbehør", "desc"]);
+  const iPris = colIndex(heads, ["pris"]);
+  const iAlm = colIndex(heads, ["alm"]);
+  const iDeep = colIndex(heads, ["deep"]);
+  const iFam = colIndex(heads, ["familie", "fam"]);
+  const iXl = colIndex(heads, ["xl"]);
+  const iXxl = colIndex(heads, ["xxl"]);
+  const groups = {};
+  rows.slice(1).forEach((r) => {
+    const cells = (r || []).map((c) => (c == null ? "" : c));
+    if (!cells.some((c) => String(c).trim())) return;
+    const title = iCol >= 0 ? String(cells[iCol] || "MENU") : "MENU";
+    const num = iNr >= 0 ? String(cells[iNr] || "") : "";
+    const name = iName >= 0 ? String(cells[iName] || "") : String(cells[2] || cells[1] || "");
+    const desc = iDesc >= 0 ? String(cells[iDesc] || "") : "";
+    let prices = [];
+    if (n === 1) {
+      const p = iPris >= 0 ? cells[iPris] : (iAlm >= 0 ? cells[iAlm] : "");
+      prices = [String(p == null ? "" : p)];
+    } else if (n === 3) {
+      prices = [cells[iAlm], cells[iDeep], cells[iFam]].map((p) => String(p == null ? "" : p));
+    } else {
+      prices = [cells[iAlm], cells[iDeep], cells[iFam], cells[iXl], cells[iXxl]].map((p) => String(p == null ? "" : p));
+    }
+    if (!groups[title]) groups[title] = [];
+    groups[title].push({
+      num, name, desc,
+      price: prices[0] || "",
+      prices,
+      nightAdd: "", lunchAdd: "",
+    });
+  });
+  Object.keys(groups).forEach((title) => {
+    sections.push({
+      title,
+      sizes: n === 1 ? [] : labels.slice(0, n),
+      items: groups[title],
+    });
+  });
+  paintStudio();
+  if ($("sstatus")) $("sstatus").textContent = "Kladde — ikke sendt";
+  if ($("xlwiz")) $("xlwiz").classList.add("hidden");
+  pendingXl = null;
+}
+if ($("xlcancel")) $("xlcancel").addEventListener("click", () => { if ($("xlwiz")) $("xlwiz").classList.add("hidden"); pendingXl = null; });
+if ($("xldo")) $("xldo").addEventListener("click", applyExcelWizard);
+if ($("xlcount")) $("xlcount").addEventListener("change", () => {
+  const n = $("xlcount").value;
+  if ($("xllabs")) $("xllabs").value = n === "5" ? "Alm, Deep pan, Familie, XL, XXL" : (n === "3" ? "Alm, Deep pan, Familie" : "Pris");
+});
 function addScanned(title, found) {
   if (!found || !found.length) {
     alert("Ingen linjer i filen.");
@@ -625,7 +719,7 @@ if ($("sfile")) {
         if (!window.XLSX) throw new Error("Excel-læser mangler. Genindlæs siden.");
         const wb = XLSX.read(await f.arrayBuffer(), { type: "array" });
         const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1 });
-        addScanned(wb.SheetNames[0], rowsToItems(rows));
+        openExcelWizard(rows);
       } else if (nm.endsWith(".docx")) {
         const p = linesToItems(await readDocx(f));
         addScanned(p.title, p.found);

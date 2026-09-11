@@ -119,6 +119,24 @@
     </div>
     <div id="scols" class="col-board"></div>
   </div>
+  <div id="xlwiz" class="xlwiz hidden">
+    <div class="xlbox">
+      <h3>Sådan skal Excel læses</h3>
+      <p id="xlhint"></p>
+      <label>Hvor mange priser?
+        <select id="xlcount">
+          <option value="1">1 pris</option>
+          <option value="3">3 størrelser</option>
+          <option value="5">5 størrelser</option>
+        </select>
+      </label>
+      <label>Størrelser (kommasepareret) <input id="xllabs" value="Alm, Deep pan, Familie" /></label>
+      <div class="row-between">
+        <button type="button" class="ghost" id="xlcancel">Annuller</button>
+        <button type="button" class="primary" id="xldo">Læg ind</button>
+      </div>
+    </div>
+  </div>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
