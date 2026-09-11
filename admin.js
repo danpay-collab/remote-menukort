@@ -210,11 +210,8 @@ $("newbtn").addEventListener("click", () => {
 $("closecreate").addEventListener("click", () => $("create").classList.add("hidden"));
 $("createbtn").addEventListener("click", async () => {
   if (!db) return;
-  const cvr = ($("cvr").value || "").replace(/[^0-9]/g, "");
-  if (cvr.length !== 8) {
-    $("cmsg").textContent = "CVR skal være 8 cifre.";
-    return;
-  }
+  let cvr = ($("cvr").value || "").trim();
+  if (!cvr) cvr = "kunde-" + Date.now();
   await db.collection("customers").doc(cvr).set({
     name: $("cname").value,
     address: $("caddr").value,
