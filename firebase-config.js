@@ -2,10 +2,10 @@
 // Erstat KUN indholdet inden i firebaseConfig.
 
 window.firebaseConfig = {
-  apiKey: "INDSÆT",
+  apiKey: "AIzaSyDBDtRL5LEuwyjqLsXuN2e5ZkPIePHViFg",
   authDomain: "remote-menukort.firebaseapp.com",
   projectId: "remote-menukort",
-  storageBucket: "remote-menukort.appspot.com",
-  messagingSenderId: "INDSÆT",
-  appId: "INDSÆT"
+  storageBucket: "remote-menukort.firebasestorage.app",
+  messagingSenderId: "614574171492",
+  appId: "1:614574171492:web:ab76262b8899558e4c0671"
 };
