@@ -72,7 +72,7 @@
         <label>Note <input id="footerNote" /></label>
         <div class="row-between">
           <h3>Retter</h3>
-          <button type="button" class="ghost" id="add">+ Tilføj</button>
+          <button type="button" class="ghost" id="add">+ Tilføj menu</button>
         </div>
         <div id="items"></div>
         <div class="actions">
@@ -81,6 +81,31 @@
           <span id="msg"></span>
         </div>
       </section>
+    </div>
+  </div>
+  <div id="studio" class="studio hidden">
+    <div class="studio-bar">
+      <strong>Skriv på skærmen</strong>
+      <span id="stitle"></span>
+      <button type="button" class="ghost" id="sadd">+ Ny ret</button>
+      <label class="cols">Kolonner
+        <select id="scols">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+        </select>
+      </label>
+      <button type="button" class="primary" id="ssave">Send til TV</button>
+      <button type="button" class="ghost" id="sclose">Luk</button>
+    </div>
+    <div class="tv-frame">
+      <div class="tv-top">
+        <input id="svenue" placeholder="Overskrift" />
+        <input id="ssub" placeholder="Undertitel" />
+      </div>
+      <div id="sgrid" class="tv-grid cols-2"></div>
+      <div class="tv-tick"><input id="sticker" placeholder="Lysavis nederst" /></div>
     </div>
   </div>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>

@@ -97,3 +97,20 @@ select{width:100%;margin-top:4px;padding:10px 12px;border-radius:8px;border:1px 
 .side-form input,.side-form select{background:#1b1713;color:#f4efe6;border-color:#3a3229}
 .side-form .primary{width:100%;margin-top:8px}
 preview { background:#1b1713;color:#f0d9a8;padding:10px;border-radius:10px;font-size:13px;margin:10px 0; }
+.studio { position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 8000; display: flex; flex-direction: column; }
+.studio.hidden { display: none; }
+.studio-bar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; background: #1b1713; color: #f4efe6; padding: 10px 14px; }
+.studio-bar .cols { color: #cbbba6; font-size: 13px; }
+.tv-frame { flex: 1; margin: 16px; background: #14110e; color: #f4efe6; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; }
+.tv-top { padding: 16px 20px 8px; }
+.tv-top input { background: transparent; border: 0; border-bottom: 1px solid #3a3229; color: #f4efe6; font-size: 28px; font-family: Georgia, serif; }
+.tv-top input + input { font-size: 16px; color: #b7aa98; }
+.tv-grid { flex: 1; display: grid; gap: 10px; padding: 12px 20px; overflow: auto; }
+.tv-grid.cols-1 { grid-template-columns: 1fr; }
+.tv-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+.tv-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+.tv-grid.cols-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+.tv-card { background: #1e1a16; border: 1px solid #3a3229; border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 6px; }
+.tv-card input { background: #14110e; color: #f4efe6; border-color: #3a3229; }
+.tv-tick { background: #0e0c0a; padding: 8px 12px; }
+.tv-tick input { background: transparent; border: 0; color: #f0d9a8; width: 100%; }

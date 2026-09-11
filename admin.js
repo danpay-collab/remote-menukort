@@ -281,9 +281,57 @@ $("delcust").addEventListener("click", async () => {
   $("panel").classList.add("hidden");
 });
 $("close").addEventListener("click", () => $("panel").classList.add("hidden"));
-$("add").addEventListener("click", () => {
-  items.push({ name: "Ny ret", desc: "", price: "0", visible: true });
+function paintStudio() {
+  const cols = $("scols").value || "2";
+  $("sgrid").className = "tv-grid cols-" + cols;
+  $("sgrid").innerHTML = "";
+  items.forEach((item, idx) => {
+    const card = document.createElement("div");
+    card.className = "tv-card";
+    card.innerHTML = `<input data-k="name" placeholder="Ret" /><input data-k="desc" placeholder="Beskrivelse" /><input data-k="price" placeholder="Pris" /><button type="button" data-del>Fjern</button>`;
+    card.querySelector('[data-k="name"]').value = item.name || "";
+    card.querySelector('[data-k="desc"]').value = item.desc || "";
+    card.querySelector('[data-k="price"]').value = item.price || "";
+    card.querySelectorAll("input").forEach((inp) => {
+      inp.addEventListener("input", () => { items[idx][inp.dataset.k] = inp.value; });
+    });
+    card.querySelector("[data-del]").addEventListener("click", () => {
+      items.splice(idx, 1);
+      paintStudio();
+      drawItems();
+    });
+    $("sgrid").appendChild(card);
+  });
+}
+
+function openStudio() {
+  if (!currentId) return;
+  $("studio").classList.remove("hidden");
+  $("stitle").textContent = $("ename").value || currentId;
+  $("svenue").value = $("venue").value || "";
+  $("ssub").value = $("footerNote").value || "";
+  $("sticker").value = $("ticker").value || "";
+  if (!items.length) items.push({ name: "", desc: "", price: "", visible: true });
+  paintStudio();
+}
+
+$("add").addEventListener("click", openStudio);
+$("sadd").addEventListener("click", () => {
+  items.push({ name: "", desc: "", price: "", visible: true });
+  paintStudio();
   drawItems();
+});
+$("scols").addEventListener("change", paintStudio);
+$("sclose").addEventListener("click", () => $("studio").classList.add("hidden"));
+$("svenue").addEventListener("input", () => { $("venue").value = $("svenue").value; });
+$("sticker").addEventListener("input", () => { $("ticker").value = $("sticker").value; });
+$("ssave").addEventListener("click", () => {
+  $("venue").value = $("svenue").value;
+  $("ticker").value = $("sticker").value;
+  $("footerNote").value = $("ssub").value;
+  drawItems();
+  $("save").click();
+  $("studio").classList.add("hidden");
 });
 $("save").addEventListener("click", async () => {
   if (!db || !currentId) return;
