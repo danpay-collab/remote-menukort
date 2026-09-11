@@ -46,12 +46,22 @@ body.board {
 }
 .sec.box h2 { color: #2f7a32; }
 .row { display: grid; grid-template-columns: 28px 1fr auto; gap: 6px; align-items: start; margin: 0 0 7px; }
-.num { font-weight: 800; }
-.name { font-weight: 800; text-transform: uppercase; }
+.num, .name, .price, .sec h2 {
+  font-family: Montserrat, Arial, sans-serif;
+  font-weight: 800;
+}
+.name { text-transform: uppercase; font-size: 1.05em; }
 .dots { border-bottom: 1px dotted #333; margin: 0 6px; min-width: 12px; flex: 1; }
 .line { display: flex; align-items: baseline; gap: 4px; }
 .price { font-weight: 800; white-space: nowrap; }
-.desc { margin: 0; font-size: 13px; color: #333; }
+.desc {
+  margin: 2px 0 0;
+  font-size: 0.72em;
+  line-height: 1.2;
+  font-weight: 400;
+  font-family: Montserrat, Arial, sans-serif;
+  color: #333;
+}
 .badge { font-size: 11px; background: #f3d36a; padding: 1px 5px; border-radius: 8px; margin-left: 6px; }
 .board-tick {
   background: #1a1a1a; color: #f0d9a8; height: 42px;
