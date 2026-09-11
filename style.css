@@ -118,7 +118,7 @@ preview { background:#1b1713;color:#f0d9a8;padding:10px;border-radius:10px;font-
 .col-card { min-width: 280px; flex: 1; background: #fff; border-radius: 12px; padding: 12px; overflow: visible; max-height: none; }
 .col-title { text-align: center; font-weight: 800; color: #2f7a32; border: 0; border-bottom: 2px solid #2f7a32; font-size: 20px; margin-bottom: 10px; }
 .prod { border-bottom: 1px solid #eee; padding: 8px 0; }
-.prod-line { display: grid; grid-template-columns: 48px 1fr 64px; gap: 6px; }
+.prod-line { display: grid; grid-template-columns: 56px 1fr 64px; gap: 6px; }
 .prod-line input { margin: 0; }
 .pdesc { margin-top: 4px; font-size: 13px; }
 .prod-btns { display: flex; gap: 6px; margin-top: 6px; }
@@ -157,7 +157,7 @@ input[hidden] { display: none !important; }
 .pprices { display: flex; gap: 4px; }
 .pprices input { width: 58px; }
 .col-card { min-width: 240px; max-width: 100%; overflow: hidden; }
-.prod-line { display: grid; grid-template-columns: 36px minmax(0,1fr) auto; gap: 4px; align-items: center; }
+.prod-line { display: grid; grid-template-columns: 56px minmax(0,1fr) auto; gap: 4px; align-items: center; }
 .prod-line .pname { min-width: 0; width: 100%; }
 .pprices { display: flex; gap: 3px; flex-wrap: nowrap; }
 .pprices input { width: 48px !important; min-width: 44px; padding: 4px; font-size: 12px; }

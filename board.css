@@ -45,7 +45,7 @@ body.board {
   margin-top: 8px;
 }
 .sec.box h2 { color: #2f7a32; }
-.row { display: grid; grid-template-columns: 28px 1fr auto; gap: 6px; align-items: start; margin: 0 0 7px; }
+.row { display: grid; grid-template-columns: 52px 1fr auto; gap: 6px; align-items: start; margin: 0 0 7px; }
 .num, .name, .price, .sec h2 {
   font-family: Montserrat, Arial, sans-serif;
   font-weight: 800;
