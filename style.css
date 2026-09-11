@@ -97,7 +97,7 @@ select{width:100%;margin-top:4px;padding:10px 12px;border-radius:8px;border:1px 
 .side-form input,.side-form select{background:#1b1713;color:#f4efe6;border-color:#3a3229}
 .side-form .primary{width:100%;margin-top:8px}
 preview { background:#1b1713;color:#f0d9a8;padding:10px;border-radius:10px;font-size:13px;margin:10px 0; }
-.studio { position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 8000; display: flex; flex-direction: column; }
+.studio { position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 8000; display: flex; flex-direction: column; height: 100vh; min-height: 0; }
 .studio.hidden { display: none; }
 .studio-bar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; background: #1b1713; color: #f4efe6; padding: 10px 14px; }
 .studio-bar .cols { color: #cbbba6; font-size: 13px; }
@@ -114,8 +114,8 @@ preview { background:#1b1713;color:#f0d9a8;padding:10px;border-radius:10px;font-
 .tv-card input { background: #14110e; color: #f4efe6; border-color: #3a3229; }
 .tv-tick { background: #0e0c0a; padding: 8px 12px; }
 .tv-tick input { background: transparent; border: 0; color: #f0d9a8; width: 100%; }
-.col-board { flex: 1; display: flex; gap: 16px; overflow: auto; padding: 16px; background: #ece7df; }
-.col-card { min-width: 280px; flex: 1; background: #fff; border-radius: 12px; padding: 12px; }
+.col-board { flex: 1; min-height: 0; display: flex; gap: 16px; overflow: auto; padding: 16px; background: #ece7df; align-items: flex-start; }
+.col-card { min-width: 280px; flex: 1; background: #fff; border-radius: 12px; padding: 12px; overflow: visible; max-height: none; }
 .col-title { text-align: center; font-weight: 800; color: #2f7a32; border: 0; border-bottom: 2px solid #2f7a32; font-size: 20px; margin-bottom: 10px; }
 .prod { border-bottom: 1px solid #eee; padding: 8px 0; }
 .prod-line { display: grid; grid-template-columns: 48px 1fr 64px; gap: 6px; }
@@ -164,3 +164,9 @@ input[hidden] { display: none !important; }
 .snames { display: flex; gap: 3px; flex-wrap: wrap; }
 .snames input { width: 70px !important; font-size: 12px; }
 .sizes { flex-wrap: wrap; }
+.col-top { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+.col-top .col-title { flex: 1; }
+.col-top [data-delcol] { white-space: nowrap; }
+
+.col-card { overflow: visible !important; }
+.col-board { overflow: auto !important; min-height: 0 !important; }

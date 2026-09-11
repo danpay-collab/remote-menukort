@@ -358,7 +358,7 @@ function paintStudio() {
   sections.forEach((sec, si) => {
     const col = document.createElement("div");
     col.className = "col-card";
-    col.innerHTML = `<input class="col-title" placeholder="BURGERS / PIZZA" /><div class="sizes"><select class="scount"><option value="1">1 pris</option><option value="3">3 størrelser</option><option value="5">5 størrelser</option></select><div class="snames"></div></div><div class="col-items"></div><button type="button" class="ghost" data-delcol>Fjern kolonne</button>`;
+    col.innerHTML = `<div class="col-top"><input class="col-title" placeholder="BURGERS / PIZZA" /><button type="button" class="ghost" data-delcol>Fjern kolonne</button></div><div class="sizes"><select class="scount"><option value="1">1 pris</option><option value="3">3 størrelser</option><option value="5">5 størrelser</option></select><div class="snames"></div></div><div class="col-items"></div>`;
     col.querySelector(".col-title").value = sec.title || "";
     col.querySelector(".col-title").addEventListener("input", (e) => { sections[si].title = e.target.value; });
     col.querySelector("[data-delcol]").addEventListener("click", () => {
@@ -400,15 +400,14 @@ function paintStudio() {
         <div class="prod-btns">
           <button type="button" data-add>+</button>
           <button type="button" data-del>−</button>
-          <button type="button" data-eye>øje</button>
-          <button type="button" data-night>Natpris</button>
-          <input class="pnight extra" placeholder="+ nat" />
-          <input class="pnfrom extra" placeholder="22:00" />
-          <input class="pnto extra" placeholder="05:00" />
           <button type="button" data-lunch>Frokost</button>
           <input class="plunch extra" placeholder="+ frokost" />
           <input class="plfrom extra" placeholder="11:00" />
           <input class="plto extra" placeholder="15:00" />
+          <button type="button" data-night>Natpris</button>
+          <input class="pnight extra" placeholder="+ nat" />
+          <input class="pnfrom extra" placeholder="22:00" />
+          <input class="pnto extra" placeholder="05:00" />
         </div>`;
       row.querySelector(".num").value = it.num || "";
       row.querySelector(".pname").value = it.name || "";
@@ -461,11 +460,6 @@ function paintStudio() {
         paintStudio();
       });
       if (it.visible === false) row.classList.add("off");
-      row.querySelector("[data-eye]").addEventListener("click", () => {
-        sections[si].items[ii].visible = sections[si].items[ii].visible === false;
-        paintStudio();
-        if ($("sstatus")) $("sstatus").textContent = "Kladde — ikke sendt";
-      });
       box.appendChild(row);
     });
     const limit = Math.max(6, Math.floor(((Number($("spy") && $("spy").value) || 1080) - 220) / 78));
