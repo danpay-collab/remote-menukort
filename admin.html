@@ -50,6 +50,22 @@
         <p id="pcity" class="muted"></p>
         <div id="pscreens" class="screens"></div>
         <p class="tv-url muted" id="tvurl"></p>
+        <label>Firmanavn <input id="ename" /></label>
+        <label>Adresse <input id="eaddr" /></label>
+        <label>By <input id="ecity" /></label>
+        <label>Landsdel
+          <select id="eregion">
+            <option>Nordjylland</option>
+            <option>Midtjylland</option>
+            <option>Sønderjylland</option>
+            <option>Fyn</option>
+            <option>Sjælland</option>
+            <option>Lolland-Falster</option>
+            <option>Bornholm</option>
+          </select>
+        </label>
+        <label>Antal skærme <input id="escreens" type="number" min="1" /></label>
+        <label>Telefon <input id="ephone" /></label>
         <label>Overskrift på TV <input id="venue" /></label>
         <label>Lysavis <input id="ticker" /></label>
         <label>Note <input id="footerNote" /></label>
@@ -59,7 +75,8 @@
         </div>
         <div id="items"></div>
         <div class="actions">
-          <button type="button" class="primary" id="save">Send til skærmen</button>
+          <button type="button" class="primary" id="save">Gem og send</button>
+          <button type="button" class="ghost" id="delcust">Slet kunde</button>
           <span id="msg"></span>
         </div>
       </section>

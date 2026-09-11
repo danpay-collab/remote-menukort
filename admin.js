@@ -153,13 +153,19 @@ async function openCustomer(id) {
   const c = snap.data();
   $("panel").classList.remove("hidden");
   $("pname").textContent = c.name || id;
-  $("pcity").textContent = "CVR " + id + " · " + (c.address || "") + ", " + (c.city || "") + " · " + (c.region || "") + " · " + (c.screenCount || 1) + " skærm(e)";
+  $("pcity").textContent = "CVR " + id;
+  $("ename").value = c.name || "";
+  $("eaddr").value = c.address || "";
+  $("ecity").value = c.city || "";
+  $("eregion").value = REGIONS.includes(c.region) ? c.region : "Fyn";
+  $("escreens").value = c.screenCount || 1;
+  $("ephone").value = c.phone || "";
   $("venue").value = c.venue || "";
   $("ticker").value = c.ticker || "";
   $("footerNote").value = c.footerNote || "";
   items = c.items || [];
   drawItems();
-  const base = location.origin + location.pathname.replace(/admin\\.html.*/, "");
+  const base = location.origin + location.pathname.replace(/admin.html.*/, "");
   $("tvurl").textContent = "TV: " + base + "display.html?id=" + id;
   const box = $("pscreens");
   const screens = c.screens || {};
@@ -204,7 +210,7 @@ $("newbtn").addEventListener("click", () => {
 $("closecreate").addEventListener("click", () => $("create").classList.add("hidden"));
 $("createbtn").addEventListener("click", async () => {
   if (!db) return;
-  const cvr = ($("cvr").value || "").replace(/\\D/g, "");
+  const cvr = ($("cvr").value || "").replace(/[^0-9]/g, "");
   if (cvr.length !== 8) {
     $("cmsg").textContent = "CVR skal være 8 cifre.";
     return;
@@ -235,6 +241,17 @@ $("seed").addEventListener("click", async () => {
   alert("Testkunder med CVR ligger i databasen.");
 });
 
+$("delcust").addEventListener("click", async () => {
+  if (!db || !currentId) return;
+  if (!confirm("Slet kunden " + currentId + "?")) return;
+  await db.collection("customers").doc(currentId).delete();
+  if (markers[currentId]) {
+    map.removeLayer(markers[currentId]);
+    delete markers[currentId];
+  }
+  currentId = null;
+  $("panel").classList.add("hidden");
+});
 $("close").addEventListener("click", () => $("panel").classList.add("hidden"));
 $("add").addEventListener("click", () => {
   items.push({ name: "Ny ret", desc: "", price: "0", visible: true });
@@ -243,6 +260,12 @@ $("add").addEventListener("click", () => {
 $("save").addEventListener("click", async () => {
   if (!db || !currentId) return;
   await db.collection("customers").doc(currentId).set({
+    name: $("ename").value,
+    address: $("eaddr").value,
+    city: $("ecity").value,
+    region: $("eregion").value,
+    screenCount: Number($("escreens").value || 1),
+    phone: $("ephone").value,
     venue: $("venue").value,
     ticker: $("ticker").value,
     footerNote: $("footerNote").value,
