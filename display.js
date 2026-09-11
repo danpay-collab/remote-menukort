@@ -66,7 +66,9 @@ function render(data) {
       if (sec.sizes && sec.sizes.length > 1) {
         const sh = document.createElement("div");
         sh.className = "sizehead";
-        sh.textContent = sec.sizes.join("   ·   ");
+        sh.style.display = "grid";
+        sh.style.gridTemplateColumns = "28px 1fr repeat(" + sec.sizes.length + ", 54px)";
+        sh.innerHTML = "<span></span><span></span>" + sec.sizes.map((s) => "<span>" + s + "</span>").join("");
         box.appendChild(sh);
       }
       if (sec.note) {
@@ -78,7 +80,9 @@ function render(data) {
       (sec.items || []).filter((it) => it && it.visible !== false).forEach((it) => {
         const el = document.createElement("article");
         el.className = "row";
-        el.innerHTML = `<div class="num"></div><div><div class="line"><span class="name"></span></div><p class="desc"></p></div><div class="price"></div>`;
+        const nS = (sec.sizes && sec.sizes.length > 1) ? sec.sizes.length : 1;
+        el.style.gridTemplateColumns = nS > 1 ? ("28px 1fr repeat(" + nS + ", 52px)") : "28px 1fr auto";
+        el.innerHTML = `<div class="num"></div><div><div class="line"><span class="name"></span></div><p class="desc"></p></div>`;
         el.querySelector(".num").textContent = it.num || "";
         el.querySelector(".name").textContent = it.name || "";
         el.querySelector(".desc").textContent = it.desc || "";
@@ -89,11 +93,18 @@ function render(data) {
         const shown = (Number.isFinite(base) && it.price !== "" && it.price != null)
           ? String(base + add).replace(/\.0$/, "") + ",-"
           : (it.price ? it.price + ",-" : "");
-        const list = (it.prices && it.prices.length > 1) ? it.prices : [it.price];
-        el.querySelector(".price").textContent = list.filter((p) => p !== "" && p != null).map((p) => {
-          const n = Number(String(p).replace(",", "."));
-          return (Number.isFinite(n) ? String(n + add).replace(/\.0$/, "") : p) + ",-";
-        }).join("  ");
+        const list = (it.prices && it.prices.length) ? it.prices : [it.price];
+        const need = nS > 1 ? nS : 1;
+        for (let i = 0; i < need; i++) {
+          const cell = document.createElement("div");
+          cell.className = "price";
+          const p = list[i];
+          if (p !== "" && p != null) {
+            const n = Number(String(p).replace(",", "."));
+            cell.textContent = (Number.isFinite(n) ? String(n + add).replace(/\.0$/, "") : p) + ",-";
+          }
+          el.appendChild(cell);
+        }
         if (add) {
           const n = document.createElement("span");
           n.className = "badge";
