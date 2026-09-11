@@ -378,22 +378,39 @@ function paintStudio() {
           <button type="button" data-add>+</button>
           <button type="button" data-del>−</button>
           <button type="button" data-night>Natpris</button>
-          <input class="pnight" placeholder="+ kr nat" />
+          <input class="pnight extra" placeholder="+ nat" />
+          <input class="pnfrom extra" placeholder="22:00" />
+          <input class="pnto extra" placeholder="05:00" />
+          <button type="button" data-lunch>Frokost</button>
+          <input class="plunch extra" placeholder="+ frokost" />
+          <input class="plfrom extra" placeholder="11:00" />
+          <input class="plto extra" placeholder="15:00" />
         </div>`;
       row.querySelector(".num").value = it.num || "";
       row.querySelector(".pname").value = it.name || "";
       row.querySelector(".pprice").value = it.price || "";
       row.querySelector(".pdesc").value = it.desc || "";
       row.querySelector(".pnight").value = it.nightAdd || "";
+      row.querySelector(".pnfrom").value = it.nightFrom || "22:00";
+      row.querySelector(".pnto").value = it.nightTo || "05:00";
+      row.querySelector(".plunch").value = it.lunchAdd || "";
+      row.querySelector(".plfrom").value = it.lunchFrom || "11:00";
+      row.querySelector(".plto").value = it.lunchTo || "15:00";
       row.querySelector(".num").addEventListener("input", (e) => { sections[si].items[ii].num = e.target.value; });
       row.querySelector(".pname").addEventListener("input", (e) => { sections[si].items[ii].name = e.target.value; });
       row.querySelector(".pprice").addEventListener("input", (e) => { sections[si].items[ii].price = e.target.value; });
       row.querySelector(".pdesc").addEventListener("input", (e) => { sections[si].items[ii].desc = e.target.value; });
       row.querySelector(".pnight").addEventListener("input", (e) => { sections[si].items[ii].nightAdd = e.target.value; });
+      row.querySelector(".pnfrom").addEventListener("input", (e) => { sections[si].items[ii].nightFrom = e.target.value; });
+      row.querySelector(".pnto").addEventListener("input", (e) => { sections[si].items[ii].nightTo = e.target.value; });
+      row.querySelector(".plunch").addEventListener("input", (e) => { sections[si].items[ii].lunchAdd = e.target.value; });
+      row.querySelector(".plfrom").addEventListener("input", (e) => { sections[si].items[ii].lunchFrom = e.target.value; });
+      row.querySelector(".plto").addEventListener("input", (e) => { sections[si].items[ii].lunchTo = e.target.value; });
       row.querySelector("[data-night]").addEventListener("click", () => {
-        const box = row.querySelector(".pnight");
-        box.style.display = "inline-block";
-        box.focus();
+        row.classList.toggle("show-night");
+      });
+      row.querySelector("[data-lunch]").addEventListener("click", () => {
+        row.classList.toggle("show-lunch");
       });
       row.querySelector("[data-add]").addEventListener("click", () => {
         sections[si].items.splice(ii + 1, 0, { num: "", name: "", desc: "", price: "" });
@@ -462,6 +479,40 @@ if ($("sbg")) {
     $("stitle").textContent = "Baggrund klar — send til TV";
   });
 }
+if ($("sscan")) {
+  $("sscan").addEventListener("change", async (e) => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    if (!window.Tesseract) { alert("Scanner-biblioteket blev ikke hentet."); return; }
+    $("stitle").textContent = "Scanner menukort…";
+    try {
+      const out = await Tesseract.recognize(f, "dan+eng");
+      const lines = (out.data.text || "").split(/\n/).map((l) => l.trim()).filter(Boolean);
+      const found = [];
+      let title = "SCAN";
+      lines.forEach((line) => {
+        const m = line.match(/^(?:(\d{1,3})\s+)?([A-Za-zÆØÅæøå0-9 .'\-]+?)\s+(\d{2,4})\s*,?-?\s*$/);
+        if (m) {
+          found.push({ num: m[1] || "", name: m[2].trim(), desc: "", price: m[3], nightAdd: "", lunchAdd: "" });
+        } else if (line === line.toUpperCase() && line.length < 28) {
+          title = line;
+        } else if (found.length) {
+          found[found.length - 1].desc = (found[found.length - 1].desc + " " + line).trim();
+        }
+      });
+      if (!found.length) {
+        alert("Kunne ikke læse retter. Skriv dem selv, eller tag et skarpere billede.");
+      } else {
+        sections.push({ title: title, items: found });
+        paintStudio();
+        alert("Læste " + found.length + " linjer. Tjek og ret før du sender.");
+      }
+    } catch (err) {
+      alert("Scan fejlede: " + err.message);
+    }
+    $("stitle").textContent = currentId || "";
+  });
+}
 if ($("sview")) {
   $("sview").addEventListener("click", () => {
     if (!currentId) return;
@@ -475,9 +526,15 @@ $("ssave").addEventListener("click", async () => {
   sections.forEach((s) => (s.items || []).forEach((it) => items.push({ ...it, visible: true })));
   try {
     const tvs = [];
-    if ($("sc1") && $("sc1").checked) tvs.push(1);
-    if ($("sc2") && $("sc2").checked) tvs.push(2);
-    if ($("sc3") && $("sc3").checked) tvs.push(3);
+    if ($("scon")) {
+      Array.from($("scon").selectedOptions).forEach((o) => tvs.push(Number(o.value)));
+    }
+    const pick = ($("scpick") && $("scpick").value) || "1";
+    const screenPx = {};
+    screenPx[pick] = {
+      w: Number($("spx") && $("spx").value) || 1920,
+      h: Number($("spy") && $("spy").value) || 1080,
+    };
     const payload = {
       sections,
       items,
@@ -485,8 +542,7 @@ $("ssave").addEventListener("click", async () => {
       pxW: Number($("spx") && $("spx").value) || 1920,
       pxH: Number($("spy") && $("spy").value) || 1080,
       tvScreens: tvs.length ? tvs : [1],
-      nightFrom: ($("snatfra") && $("snatfra").value) || "22:00",
-      nightTo: ($("snattil") && $("snattil").value) || "05:00",
+      screenPx,
     };
     if (pendingBg) payload.bg = pendingBg;
     await db.collection("customers").doc(currentId).set(payload, { merge: true });

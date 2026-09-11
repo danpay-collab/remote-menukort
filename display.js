@@ -73,7 +73,9 @@ function render(data) {
         el.querySelector(".name").textContent = it.name || "";
         el.querySelector(".desc").textContent = it.desc || "";
         const base = Number(String(it.price || "").replace(",", "."));
-        const add = (isNight(data.nightFrom || "22:00", data.nightTo || "05:00") ? Number(it.nightAdd || 0) : 0);
+        const lunchOn = Number(it.lunchAdd || 0) && isNight(it.lunchFrom || "11:00", it.lunchTo || "15:00");
+        const nightOn = Number(it.nightAdd || 0) && isNight(it.nightFrom || "22:00", it.nightTo || "05:00");
+        const add = lunchOn ? Number(it.lunchAdd) : (nightOn ? Number(it.nightAdd) : 0);
         const shown = (Number.isFinite(base) && it.price !== "" && it.price != null)
           ? String(base + add).replace(/\.0$/, "") + ",-"
           : (it.price ? it.price + ",-" : "");
@@ -81,7 +83,7 @@ function render(data) {
         if (add) {
           const n = document.createElement("span");
           n.className = "badge";
-          n.textContent = "nat";
+          n.textContent = lunchOn ? "frokost" : "nat";
           el.querySelector(".line").appendChild(n);
         }
         if (it.badge) {

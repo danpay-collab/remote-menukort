@@ -124,3 +124,8 @@ preview { background:#1b1713;color:#f0d9a8;padding:10px;border-radius:10px;font-
 .prod-btns { display: flex; gap: 6px; margin-top: 6px; }
 .prod-btns button { padding: 4px 10px; }
 .studio { display: flex; flex-direction: column; }
+.studio-bar, .studio-bar label, .studio-bar strong, .studio-bar span { color: #fff; }
+.studio-bar input, .studio-bar select { color: #1b1713; }
+.prod .extra { display: none; width: 72px; }
+.prod.show-night .pnight, .prod.show-night .pnfrom, .prod.show-night .pnto { display: inline-block; }
+.prod.show-lunch .plunch, .prod.show-lunch .plfrom, .prod.show-lunch .plto { display: inline-block; }

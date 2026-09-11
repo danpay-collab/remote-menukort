@@ -90,13 +90,23 @@
       <strong>Menukort</strong>
       <span id="stitle"></span>
       <button type="button" class="ghost" id="saddcol">+ Ny kolonne</button>
+      <label>Skærm
+        <select id="scpick">
+          <option value="1">Skærm 1</option>
+          <option value="2">Skærm 2</option>
+          <option value="3">Skærm 3</option>
+        </select>
+      </label>
       <label>Px B <input id="spx" type="number" value="1920" style="width:72px" /></label>
       <label>Px H <input id="spy" type="number" value="1080" style="width:72px" /></label>
-      <label><input type="checkbox" id="sc1" checked /> Skærm 1</label>
-      <label><input type="checkbox" id="sc2" /> Skærm 2</label>
-      <label><input type="checkbox" id="sc3" /> Skærm 3</label>
-      <label>Nat fra <input id="snatfra" value="22:00" style="width:64px" /></label>
-      <label>Nat til <input id="snattil" value="05:00" style="width:64px" /></label>
+      <label>På skærme
+        <select id="scon" multiple size="3">
+          <option value="1" selected>1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+        </select>
+      </label>
+      <label>Scan kort <input type="file" id="sscan" accept="image/*" /></label>
       <label class="bg-lab">Baggrund <input type="file" id="sbg" accept="image/*" /></label>
       <button type="button" class="ghost" id="sview">Vis menukort</button>
       <button type="button" class="primary" id="ssave">Send til TV</button>
@@ -107,6 +117,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <script src="firebase-config.js"></script>
   <script src="admin.js"></script>
 </body>
