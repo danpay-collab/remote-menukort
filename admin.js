@@ -368,17 +368,50 @@ $("saddcol").addEventListener("click", () => {
   sections.push({ title: "", items: [{ num: "", name: "", desc: "", price: "" }] });
   paintStudio();
 });
+let pendingBg = null;
+function shrinkImage(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, 1280 / Math.max(img.width, img.height));
+      const c = document.createElement("canvas");
+      c.width = Math.round(img.width * scale);
+      c.height = Math.round(img.height * scale);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+      resolve(c.toDataURL("image/jpeg", 0.55));
+    };
+    img.onerror = reject;
+    img.src = URL.createObjectURL(file);
+  });
+}
+if ($("sbg")) {
+  $("sbg").addEventListener("change", async (e) => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    $("stitle").textContent = "Klemmer billede…";
+    pendingBg = await shrinkImage(f);
+    $("stitle").textContent = "Baggrund klar — send til TV";
+  });
+}
+if ($("sview")) {
+  $("sview").addEventListener("click", () => {
+    if (!currentId) return;
+    window.open("display.html?id=" + currentId, "_blank");
+  });
+}
 $("sclose").addEventListener("click", () => $("studio").classList.add("hidden"));
 $("ssave").addEventListener("click", async () => {
   if (!db || !currentId) return;
   items = [];
   sections.forEach((s) => (s.items || []).forEach((it) => items.push({ ...it, visible: true })));
   try {
-    await db.collection("customers").doc(currentId).set({
+    const payload = {
       sections,
       items,
-      venue: $("venue").value || $("ename").value || "Menukort",
-    }, { merge: true });
+      venue: "Menukort",
+    };
+    if (pendingBg) payload.bg = pendingBg;
+    await db.collection("customers").doc(currentId).set(payload, { merge: true });
     $("studio").classList.add("hidden");
     alert("Sendt til TV. Genindlæs skærmen.");
   } catch (err) {

@@ -9,7 +9,10 @@ function tickClock() {
 }
 
 function render(data) {
-  document.getElementById("venue").textContent = data.venue || data.name || "Menukort";
+  document.getElementById("venue").textContent = "Menukort";
+  document.body.style.backgroundImage = data.bg ? "url(" + data.bg + ")" : "";
+  document.body.style.backgroundSize = "cover";
+  document.body.style.backgroundPosition = "center";
   const board = document.getElementById("board");
   board.innerHTML = "";
   let sections = (data.sections && data.sections.length) ? data.sections : [];
@@ -79,3 +82,8 @@ if (cfg && cfg.apiKey !== "INDSÆT") {
 }
 tickClock();
 setInterval(tickClock, 1000);
+document.body.addEventListener("click", () => {
+  if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  }
+});
