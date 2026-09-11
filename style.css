@@ -137,3 +137,10 @@ preview { background:#1b1713;color:#f0d9a8;padding:10px;border-radius:10px;font-
 .tab { background: transparent; color: #fff; border: 1px solid #555; border-radius: 8px; padding: 6px 8px; }
 .tab.on { border-color: #c9a36a; color: #c9a36a; }
 .tick { color: #fff; }
+.studio-bar { background: #14110e; border-bottom: 1px solid #2a241c; padding: 10px 14px; }
+.studio-bar .ghost { background: #1c1814; color: #fff; border: 1px solid #3a332b; }
+.studio-bar .go { background: #1f7a3a; color: #fff; border: 0; border-radius: 8px; padding: 7px 12px; font-weight: 700; }
+.filebtn { position: relative; overflow: hidden; cursor: pointer; background: #1c1814; border: 1px solid #3a332b; border-radius: 8px; padding: 7px 10px; color: #fff; font-size: 12px; }
+.filebtn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
+.studio-bar input[type=number] { width: 58px; background: #1c1814; color: #fff; border: 1px solid #3a332b; }
+.tab.on { background: #c9a36a; color: #14110e; border-color: #c9a36a; font-weight: 700; }
