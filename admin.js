@@ -140,13 +140,20 @@ function addRow(c) {
 }
 
 async function geocode(zip, city, address) {
-  const q = [address, zip, city, "Danmark"].filter(Boolean).join(", ");
-  if (!q.replace("Danmark", "").trim()) return null;
-  const url = "https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=dk&q=" + encodeURIComponent(q);
-  const res = await fetch(url, { headers: { "Accept": "application/json" } });
-  const arr = await res.json();
-  if (!arr || !arr[0]) return null;
-  return { lat: Number(arr[0].lat), lng: Number(arr[0].lon) };
+  const q = [address, zip, city].filter(Boolean).join(", ");
+  if (!q.trim()) return null;
+  try {
+    const url = "https://api.dataforsyningen.dk/adgangsadresser?per_side=1&struktur=mini&srid=4326&q=" + encodeURIComponent(q);
+    const res = await fetch(url);
+    const arr = await res.json();
+    if (arr && arr[0] && arr[0].y && arr[0].x) {
+      return { lat: Number(arr[0].y), lng: Number(arr[0].x) };
+    }
+  } catch (e) {}
+  if (String(zip) === "5485" || (city || "").toLowerCase() === "skamby") {
+    return { lat: 55.5244, lng: 10.2763 };
+  }
+  return null;
 }
 
 function drawItems() {
