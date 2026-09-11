@@ -1,15 +1,41 @@
 const $ = (id) => document.getElementById(id);
+const REGIONS = ["Nordjylland", "Midtjylland", "Sønderjylland", "Fyn", "Sjælland", "Lolland-Falster", "Bornholm"];
 let db = null;
 let currentId = null;
 let items = [];
 let map, markers = {};
 
 const SEED = {
-  aalborg: { name: "Nordkysten Café", city: "Aalborg", lat: 57.048, lng: 9.919, venue: "Dagens kort", ticker: "Velkommen til Aalborg", footerNote: "", items: [{ name: "Classic Burger", desc: "Cheddar, salat", price: "129", visible: true }] },
-  aarhus: { name: "Havnegrill Aarhus", city: "Aarhus", lat: 56.157, lng: 10.210, venue: "Grillkort", ticker: "Dagens steak", footerNote: "", items: [{ name: "Bøfsandwich", desc: "Bløde løg", price: "99", visible: true }] },
-  esbjerg: { name: "Vesterhavet", city: "Esbjerg", lat: 55.477, lng: 8.452, venue: "Fisk", ticker: "Dagens fangst", footerNote: "", items: [{ name: "Fiskefilet", desc: "Remoulade", price: "119", visible: true }] },
-  koebenhavn: { name: "Kødbyen Bord", city: "København", lat: 55.676, lng: 12.568, venue: "Aftenkort", ticker: "Velkommen til Kødbyen", footerNote: "", items: [{ name: "Smashburger", desc: "Dobbelt bøf", price: "139", visible: true }] },
-  odense: { name: "Test — Fyn", city: "Odense", lat: 55.403, lng: 10.402, venue: "Dagens kort", ticker: "Testskærm på Fyn • ret prisen her", footerNote: "Åbn display.html?id=odense på TV", items: [{ name: "Testburger", desc: "Ret mig", price: "89", visible: true }, { name: "Dagens ret", desc: "", price: "129", visible: true }] }
+  "38765432": {
+    name: "Test — Fyn", city: "Odense", address: "Albanigade 1", region: "Fyn",
+    lat: 55.403, lng: 10.402, phone: "", screenCount: 1,
+    venue: "Dagens kort", ticker: "Testskærm på Fyn", footerNote: "",
+    items: [{ name: "Testburger", desc: "Ret mig", price: "89", visible: true }]
+  },
+  "11223344": {
+    name: "Nordkysten Café", city: "Aalborg", address: "Boulevarden 10", region: "Nordjylland",
+    lat: 57.048, lng: 9.919, phone: "", screenCount: 2,
+    venue: "Dagens kort", ticker: "Velkommen til Aalborg", footerNote: "",
+    items: [{ name: "Classic Burger", desc: "Cheddar", price: "129", visible: true }]
+  },
+  "55667788": {
+    name: "Havnegrill Aarhus", city: "Aarhus", address: "Havnegade 4", region: "Midtjylland",
+    lat: 56.157, lng: 10.210, phone: "", screenCount: 1,
+    venue: "Grillkort", ticker: "Dagens steak", footerNote: "",
+    items: [{ name: "Bøfsandwich", desc: "", price: "99", visible: true }]
+  },
+  "99887766": {
+    name: "Vesterhavet", city: "Esbjerg", address: "Torvet 2", region: "Sønderjylland",
+    lat: 55.477, lng: 8.452, phone: "", screenCount: 1,
+    venue: "Fisk", ticker: "Dagens fangst", footerNote: "",
+    items: [{ name: "Fiskefilet", desc: "", price: "119", visible: true }]
+  },
+  "44332211": {
+    name: "Kødbyen Bord", city: "København", address: "Flæsketorvet 12", region: "Sjælland",
+    lat: 55.676, lng: 12.568, phone: "", screenCount: 3,
+    venue: "Aftenkort", ticker: "Velkommen til Kødbyen", footerNote: "",
+    items: [{ name: "Smashburger", desc: "", price: "139", visible: true }]
+  }
 };
 
 function color(status) {
@@ -25,9 +51,8 @@ function statusOf(c) {
   if (!keys.length) return "idle";
   const now = Date.now();
   const flags = keys.map((k) => {
-    const t = screens[k] && screens[k].lastSeen && screens[k].lastSeen.toMillis
-      ? screens[k].lastSeen.toMillis()
-      : (screens[k] && screens[k].lastSeen ? new Date(screens[k].lastSeen).getTime() : 0);
+    const raw = screens[k] && screens[k].lastSeen;
+    const t = raw && raw.toMillis ? raw.toMillis() : (raw ? new Date(raw).getTime() : 0);
     return now - t < 45000;
   });
   if (flags.every(Boolean)) return "ok";
@@ -54,16 +79,26 @@ function initMap() {
 function paint(docs) {
   const list = $("list");
   list.innerHTML = "";
+  REGIONS.forEach((region) => {
+    const group = docs.filter((c) => (c.region || "") === region);
+    if (!group.length) return;
+    const h = document.createElement("div");
+    h.className = "region";
+    h.textContent = region + " (" + group.length + ")";
+    list.appendChild(h);
+    group.sort((a, b) => (a.name || "").localeCompare(b.name || "", "da"));
+    group.forEach(addRow);
+  });
+  const other = docs.filter((c) => !REGIONS.includes(c.region));
+  if (other.length) {
+    const h = document.createElement("div");
+    h.className = "region";
+    h.textContent = "Uden landsdel";
+    list.appendChild(h);
+    other.forEach(addRow);
+  }
   docs.forEach((c) => {
     const st = statusOf(c);
-    const row = document.createElement("button");
-    row.type = "button";
-    row.className = "cust";
-    row.innerHTML = `<span class="dot" style="background:${color(st)}"></span><span><strong></strong><br><small></small></span>`;
-    row.querySelector("strong").textContent = c.name || c.id;
-    row.querySelector("small").textContent = c.city || "";
-    row.addEventListener("click", () => openCustomer(c.id));
-    list.appendChild(row);
     if (c.lat && c.lng) {
       if (markers[c.id]) {
         markers[c.id].setLatLng([c.lat, c.lng]);
@@ -72,12 +107,24 @@ function paint(docs) {
         const m = L.circleMarker([c.lat, c.lng], {
           radius: 10, color: color(st), fillColor: color(st), fillOpacity: 0.95, weight: 2,
         }).addTo(map);
-        m.bindTooltip(c.name || c.id);
+        m.bindTooltip((c.name || "") + " · CVR " + c.id);
         m.on("click", () => openCustomer(c.id));
         markers[c.id] = m;
       }
     }
   });
+}
+
+function addRow(c) {
+  const st = statusOf(c);
+  const row = document.createElement("button");
+  row.type = "button";
+  row.className = "cust";
+  row.innerHTML = `<span class="dot" style="background:${color(st)}"></span><span><strong></strong><br><small></small></span>`;
+  row.querySelector("strong").textContent = c.name || c.id;
+  row.querySelector("small").textContent = "CVR " + c.id + " · " + (c.city || "") + " · " + (c.screenCount || 1) + " skærm(e)";
+  row.addEventListener("click", () => openCustomer(c.id));
+  $("list").appendChild(row);
 }
 
 function drawItems() {
@@ -100,32 +147,35 @@ function drawItems() {
 
 async function openCustomer(id) {
   currentId = id;
+  $("create").classList.add("hidden");
   const snap = await db.collection("customers").doc(id).get();
   if (!snap.exists) return;
   const c = snap.data();
   $("panel").classList.remove("hidden");
   $("pname").textContent = c.name || id;
-  $("pcity").textContent = c.city || "";
+  $("pcity").textContent = "CVR " + id + " · " + (c.address || "") + ", " + (c.city || "") + " · " + (c.region || "") + " · " + (c.screenCount || 1) + " skærm(e)";
   $("venue").value = c.venue || "";
   $("ticker").value = c.ticker || "";
   $("footerNote").value = c.footerNote || "";
   items = c.items || [];
   drawItems();
-  $("tvurl").textContent = "TV: " + location.origin + location.pathname.replace(/admin\.html.*/, "") + "display.html?id=" + id;
-
+  const base = location.origin + location.pathname.replace(/admin\\.html.*/, "");
+  $("tvurl").textContent = "TV: " + base + "display.html?id=" + id;
   const box = $("pscreens");
   const screens = c.screens || {};
   const keys = Object.keys(screens);
   if (!keys.length) {
-    box.textContent = "Ingen skærm online endnu. Åbn TV-adressen i TV-browseren.";
+    box.textContent = "Ingen skærm online. Åbn TV-adressen med CVR som id.";
   } else {
     box.innerHTML = "";
     keys.forEach((sid) => {
       const s = screens[sid];
-      const ok = s.lastSeen && (Date.now() - (s.lastSeen.toMillis ? s.lastSeen.toMillis() : new Date(s.lastSeen).getTime()) < 45000);
+      const raw = s.lastSeen;
+      const t = raw && raw.toMillis ? raw.toMillis() : (raw ? new Date(raw).getTime() : 0);
+      const ok = Date.now() - t < 45000;
       const row = document.createElement("div");
       row.className = "screen-row";
-      row.innerHTML = `<span><span class="dot ${ok ? "ok" : "bad"}"></span>${(s.label || sid)}</span><span>${ok ? "kører" : "tavs"} · ${ago(s.lastSeen)}</span>`;
+      row.innerHTML = `<span><span class="dot ${ok ? "ok" : "bad"}"></span>${s.label || sid}</span><span>${ok ? "kører" : "tavs"} · ${ago(s.lastSeen)}</span>`;
       box.appendChild(row);
     });
   }
@@ -142,18 +192,47 @@ function start() {
   db = firebase.firestore();
   initMap();
   db.collection("customers").onSnapshot((snap) => {
-    const docs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-    paint(docs);
+    paint(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
     if (currentId) openCustomer(currentId);
   });
 }
 
+$("newbtn").addEventListener("click", () => {
+  $("panel").classList.add("hidden");
+  $("create").classList.remove("hidden");
+});
+$("closecreate").addEventListener("click", () => $("create").classList.add("hidden"));
+$("createbtn").addEventListener("click", async () => {
+  if (!db) return;
+  const cvr = ($("cvr").value || "").replace(/\\D/g, "");
+  if (cvr.length !== 8) {
+    $("cmsg").textContent = "CVR skal være 8 cifre.";
+    return;
+  }
+  await db.collection("customers").doc(cvr).set({
+    name: $("cname").value,
+    address: $("caddr").value,
+    city: $("ccity").value,
+    region: $("cregion").value,
+    screenCount: Number($("cscreens").value || 1),
+    phone: $("cphone").value,
+    lat: Number($("clat").value) || null,
+    lng: Number($("clng").value) || null,
+    venue: $("cname").value,
+    ticker: "",
+    footerNote: "",
+    items: [],
+    screens: {},
+  }, { merge: true });
+  $("cmsg").textContent = "Kunden er oprettet. TV: display.html?id=" + cvr;
+});
+
 $("seed").addEventListener("click", async () => {
-  if (!db) { alert("Sæt Firebase-nøgler i firebase-config.js først."); return; }
+  if (!db) { alert("Sæt Firebase-nøgler først."); return; }
   for (const [id, data] of Object.entries(SEED)) {
     await db.collection("customers").doc(id).set({ ...data, screens: {} }, { merge: true });
   }
-  alert("Testkunder ligger i Firestore nu.");
+  alert("Testkunder med CVR ligger i databasen.");
 });
 
 $("close").addEventListener("click", () => $("panel").classList.add("hidden"));

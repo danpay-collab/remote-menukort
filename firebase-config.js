@@ -1,6 +1,3 @@
-// Indsæt dine nøgler fra Firebase → Project settings → Your apps → Web
-// Erstat KUN indholdet inden i firebaseConfig.
-
 window.firebaseConfig = {
   apiKey: "AIzaSyDBDtRL5LEuwyjqLsXuN2e5ZkPIePHViFg",
   authDomain: "remote-menukort.firebaseapp.com",

@@ -86,3 +86,6 @@ h2, h3 { margin: 8px 0; }
 .warn{color:#e8b33a;font-size:13px}
 .hidden{display:none}
 .ghost.light{background:#2a241e;color:#f4efe6;border-color:#3a3229;margin:8px 0 12px;width:100%}
+
+.region{margin:14px 0 6px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#cbbba6}
+select{width:100%;margin-top:4px;padding:10px 12px;border-radius:8px;border:1px solid #d7cfc3;font:inherit}

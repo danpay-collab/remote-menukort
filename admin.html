@@ -11,20 +11,46 @@
   <div class="shell">
     <aside class="side">
       <h1>Skærmkort</h1>
-      <p class="lead">Grøn kører · Gul noget galt · Rød tavs. Klik en prik og send lysavis.</p>
+      <p class="lead">Kunder efter CVR. Listen er delt i landsdele.</p>
       <p id="cfgwarn" class="warn hidden">Indsæt Firebase-nøgler i firebase-config.js</p>
-      <button type="button" class="ghost light" id="seed">Opret testkunder i databasen</button>
+      <button type="button" class="ghost light" id="newbtn">+ Ny kunde</button>
+      <button type="button" class="ghost light" id="seed">Opret testkunder</button>
       <div id="list" class="cust-list"></div>
     </aside>
     <div class="main">
       <div id="map"></div>
+      <section class="panel hidden" id="create">
+        <button type="button" class="close" id="closecreate">Luk</button>
+        <h2>Ny kunde</h2>
+        <label>CVR-nummer <input id="cvr" maxlength="8" placeholder="12345678" /></label>
+        <label>Firmanavn / pizzeria <input id="cname" /></label>
+        <label>Adresse <input id="caddr" /></label>
+        <label>By <input id="ccity" /></label>
+        <label>Landsdel
+          <select id="cregion">
+            <option>Nordjylland</option>
+            <option>Midtjylland</option>
+            <option>Sønderjylland</option>
+            <option>Fyn</option>
+            <option>Sjælland</option>
+            <option>Lolland-Falster</option>
+            <option>Bornholm</option>
+          </select>
+        </label>
+        <label>Antal skærme <input id="cscreens" type="number" min="1" value="1" /></label>
+        <label>Telefon <input id="cphone" /></label>
+        <label>Breddegrad (valgfri) <input id="clat" placeholder="55.403" /></label>
+        <label>Længdegrad (valgfri) <input id="clng" placeholder="10.402" /></label>
+        <button type="button" class="primary" id="createbtn">Gem kunde</button>
+        <p id="cmsg" class="muted"></p>
+      </section>
       <section class="panel hidden" id="panel">
         <button type="button" class="close" id="close">Luk</button>
         <h2 id="pname"></h2>
         <p id="pcity" class="muted"></p>
         <div id="pscreens" class="screens"></div>
         <p class="tv-url muted" id="tvurl"></p>
-        <label>Overskrift <input id="venue" /></label>
+        <label>Overskrift på TV <input id="venue" /></label>
         <label>Lysavis <input id="ticker" /></label>
         <label>Note <input id="footerNote" /></label>
         <div class="row-between">
