@@ -12,11 +12,18 @@ function render(data) {
   document.getElementById("venue").textContent = data.venue || data.name || "Menukort";
   const board = document.getElementById("board");
   board.innerHTML = "";
-  const sections = data.sections && data.sections.length
-    ? data.sections
-    : [{ title: "", items: (data.items || []).map((i, n) => ({ ...i, num: String(n + 1) })) }];
-  const mid = Math.ceil(sections.length / 2) || 1;
-  const cols = [sections.slice(0, mid), sections.slice(mid)];
+  let sections = (data.sections && data.sections.length) ? data.sections : [];
+  const hasSecItems = sections.some((s) => s && s.items && s.items.length);
+  const flat = (data.items || []).filter((i) => i && (i.name || i.desc || i.price));
+  if (!hasSecItems && flat.length) {
+    sections = [{ title: "", items: flat.map((i, n) => ({
+      num: i.num || String(n + 1),
+      name: i.name || "",
+      desc: i.desc || "",
+      price: i.price || "",
+    })) }];
+  }
+  const cols = sections.map((s) => [s]);
   cols.forEach((col) => {
     const wrap = document.createElement("div");
     col.forEach((sec) => {

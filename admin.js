@@ -3,6 +3,7 @@ const REGIONS = ["Nordjylland", "Midtjylland", "Sønderjylland", "Fyn", "Sjælla
 let db = null;
 let currentId = null;
 let items = [];
+let sections = [];
 let map, markers = {};
 let placeMode = false;
 
@@ -216,7 +217,6 @@ function start() {
   initMap();
   db.collection("customers").onSnapshot((snap) => {
     paint(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
-    if (currentId) openCustomer(currentId);
   });
 }
 
@@ -284,70 +284,90 @@ $("delcust").addEventListener("click", async () => {
 });
 $("close").addEventListener("click", () => $("panel").classList.add("hidden"));
 function paintStudio() {
-  const cols = $("scols").value || "2";
-  $("sgrid").className = "tv-grid cols-" + cols;
-  $("sgrid").innerHTML = "";
-  items.forEach((item, idx) => {
-    const card = document.createElement("div");
-    card.className = "tv-card";
-    card.innerHTML = `<input data-k="name" placeholder="Ret" /><input data-k="desc" placeholder="Beskrivelse" /><input data-k="price" placeholder="Pris" /><button type="button" data-del>Fjern</button>`;
-    card.querySelector('[data-k="name"]').value = item.name || "";
-    card.querySelector('[data-k="desc"]').value = item.desc || "";
-    card.querySelector('[data-k="price"]').value = item.price || "";
-    card.querySelectorAll("input").forEach((inp) => {
-      inp.addEventListener("input", () => { items[idx][inp.dataset.k] = inp.value; });
-    });
-    card.querySelector("[data-del]").addEventListener("click", () => {
-      items.splice(idx, 1);
+  const board = $("scols");
+  board.innerHTML = "";
+  sections.forEach((sec, si) => {
+    const col = document.createElement("div");
+    col.className = "col-card";
+    col.innerHTML = `<input class="col-title" placeholder="BURGERS / PIZZA" /><div class="col-items"></div><button type="button" class="ghost" data-delcol>Fjern kolonne</button>`;
+    col.querySelector(".col-title").value = sec.title || "";
+    col.querySelector(".col-title").addEventListener("input", (e) => { sections[si].title = e.target.value; });
+    col.querySelector("[data-delcol]").addEventListener("click", () => {
+      sections.splice(si, 1);
       paintStudio();
-      drawItems();
     });
-    $("sgrid").appendChild(card);
+    const box = col.querySelector(".col-items");
+    (sec.items || []).forEach((it, ii) => {
+      const row = document.createElement("div");
+      row.className = "prod";
+      row.innerHTML = `
+        <div class="prod-line">
+          <input class="num" placeholder="nr" />
+          <input class="pname" placeholder="Produkt" />
+          <input class="pprice" placeholder="pris" />
+        </div>
+        <input class="pdesc" placeholder="Beskrivelse" />
+        <div class="prod-btns">
+          <button type="button" data-add>+</button>
+          <button type="button" data-del>−</button>
+        </div>`;
+      row.querySelector(".num").value = it.num || "";
+      row.querySelector(".pname").value = it.name || "";
+      row.querySelector(".pprice").value = it.price || "";
+      row.querySelector(".pdesc").value = it.desc || "";
+      row.querySelector(".num").addEventListener("input", (e) => { sections[si].items[ii].num = e.target.value; });
+      row.querySelector(".pname").addEventListener("input", (e) => { sections[si].items[ii].name = e.target.value; });
+      row.querySelector(".pprice").addEventListener("input", (e) => { sections[si].items[ii].price = e.target.value; });
+      row.querySelector(".pdesc").addEventListener("input", (e) => { sections[si].items[ii].desc = e.target.value; });
+      row.querySelector("[data-add]").addEventListener("click", () => {
+        sections[si].items.splice(ii + 1, 0, { num: "", name: "", desc: "", price: "" });
+        paintStudio();
+      });
+      row.querySelector("[data-del]").addEventListener("click", () => {
+        sections[si].items.splice(ii, 1);
+        paintStudio();
+      });
+      box.appendChild(row);
+    });
+    board.appendChild(col);
   });
 }
 
-function openStudio() {
-  if (!currentId) return;
+async function openStudio() {
+  if (!currentId || !db) return;
+  const snap = await db.collection("customers").doc(currentId).get();
+  const c = snap.exists ? snap.data() : {};
+  if (c.sections && c.sections.length) {
+    sections = JSON.parse(JSON.stringify(c.sections));
+  } else {
+    sections = [{ title: "BURGERS", items: [{ num: "1", name: "", desc: "", price: "" }] }];
+  }
   $("studio").classList.remove("hidden");
-  $("stitle").textContent = $("ename").value || currentId;
-  $("svenue").value = $("venue").value || "";
-  $("ssub").value = $("footerNote").value || "";
-  $("sticker").value = $("ticker").value || "";
-  if (!items.length) items.push({ name: "", desc: "", price: "", visible: true });
+  $("stitle").textContent = c.name || currentId;
   paintStudio();
 }
 
-$("loadbopos").addEventListener("click", async () => {
-  if (!db || !currentId) { alert("Vælg kunden først."); return; }
-  if (!window.BOPOS_MENU) { alert("bopos-menu.js mangler på GitHub."); return; }
+$("add").addEventListener("click", openStudio);
+$("saddcol").addEventListener("click", () => {
+  sections.push({ title: "", items: [{ num: "", name: "", desc: "", price: "" }] });
+  paintStudio();
+});
+$("sclose").addEventListener("click", () => $("studio").classList.add("hidden"));
+$("ssave").addEventListener("click", async () => {
+  if (!db || !currentId) return;
+  items = [];
+  sections.forEach((s) => (s.items || []).forEach((it) => items.push({ ...it, visible: true })));
   try {
     await db.collection("customers").doc(currentId).set({
-      venue: window.BOPOS_MENU.venue,
-      ticker: window.BOPOS_MENU.ticker,
-      sections: window.BOPOS_MENU.sections,
+      sections,
+      items,
+      venue: $("venue").value || $("ename").value || "Menukort",
     }, { merge: true });
-    alert("BoPos-menukortet er sendt. Åbn display.html?id=" + currentId);
+    $("studio").classList.add("hidden");
+    alert("Sendt til TV. Genindlæs skærmen.");
   } catch (err) {
-    alert("Kunne ikke sende kortet: " + err.message);
+    alert("Kunne ikke sende: " + err.message);
   }
-});
-$("add").addEventListener("click", openStudio);
-$("sadd").addEventListener("click", () => {
-  items.push({ name: "", desc: "", price: "", visible: true });
-  paintStudio();
-  drawItems();
-});
-$("scols").addEventListener("change", paintStudio);
-$("sclose").addEventListener("click", () => $("studio").classList.add("hidden"));
-$("svenue").addEventListener("input", () => { $("venue").value = $("svenue").value; });
-$("sticker").addEventListener("input", () => { $("ticker").value = $("sticker").value; });
-$("ssave").addEventListener("click", () => {
-  $("venue").value = $("svenue").value;
-  $("ticker").value = $("sticker").value;
-  $("footerNote").value = $("ssub").value;
-  drawItems();
-  $("save").click();
-  $("studio").classList.add("hidden");
 });
 $("save").addEventListener("click", async () => {
   if (!db || !currentId) {

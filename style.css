@@ -114,3 +114,13 @@ preview { background:#1b1713;color:#f0d9a8;padding:10px;border-radius:10px;font-
 .tv-card input { background: #14110e; color: #f4efe6; border-color: #3a3229; }
 .tv-tick { background: #0e0c0a; padding: 8px 12px; }
 .tv-tick input { background: transparent; border: 0; color: #f0d9a8; width: 100%; }
+.col-board { flex: 1; display: flex; gap: 16px; overflow: auto; padding: 16px; background: #ece7df; }
+.col-card { min-width: 280px; flex: 1; background: #fff; border-radius: 12px; padding: 12px; }
+.col-title { text-align: center; font-weight: 800; color: #2f7a32; border: 0; border-bottom: 2px solid #2f7a32; font-size: 20px; margin-bottom: 10px; }
+.prod { border-bottom: 1px solid #eee; padding: 8px 0; }
+.prod-line { display: grid; grid-template-columns: 48px 1fr 64px; gap: 6px; }
+.prod-line input { margin: 0; }
+.pdesc { margin-top: 4px; font-size: 13px; }
+.prod-btns { display: flex; gap: 6px; margin-top: 6px; }
+.prod-btns button { padding: 4px 10px; }
+.studio { display: flex; flex-direction: column; }
