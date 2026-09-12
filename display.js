@@ -45,6 +45,36 @@ function render(data) {
   board.style.fontSize = (11 * scale) + "px";
   board.innerHTML = "";
   const pack = data.boardsByScreen && data.boardsByScreen[String(SCREEN_ID)];
+  const video = (pack && pack.video) || data.video || "";
+  const videoSec = Number((pack && pack.videoSec) || data.videoSec || 20);
+  const videoGap = Number((pack && pack.videoGap) || data.videoGap || 5);
+  window._promo = window._promo || { url: "", timer: null };
+  if (video && window._promo.url !== video + videoSec + videoGap) {
+    window._promo.url = video + videoSec + videoGap;
+    clearInterval(window._promo.timer);
+    function showPromo() {
+      let v = document.getElementById("tvvid");
+      if (v) v.remove();
+      v = document.createElement("video");
+      v.id = "tvvid";
+      v.src = video;
+      v.autoplay = true;
+      v.muted = true;
+      v.playsInline = true;
+      Object.assign(v.style, { position: "fixed", inset: "0", width: "100%", height: "100%", objectFit: "cover", zIndex: "20", background: "#000" });
+      document.body.appendChild(v);
+      v.play().catch(() => {});
+      setTimeout(function () { const x = document.getElementById("tvvid"); if (x) x.remove(); }, Math.max(3, videoSec) * 1000);
+    }
+    showPromo();
+    window._promo.timer = setInterval(showPromo, Math.max(1, videoGap) * 60 * 1000);
+  }
+  if (!video) {
+    window._promo.url = "";
+    clearInterval(window._promo.timer);
+    const x = document.getElementById("tvvid");
+    if (x) x.remove();
+  }
   let sections = (pack && pack.sections && pack.sections.length)
     ? pack.sections
     : ((data.sections && data.sections.length) ? data.sections : []);

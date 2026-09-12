@@ -584,6 +584,9 @@ function stashScreen() {
     sections: JSON.parse(JSON.stringify(sections || [])),
     pxW: Number($("spx") && $("spx").value) || 1920,
     pxH: Number($("spy") && $("spy").value) || 1080,
+    video: ($("svid") && $("svid").value) || "",
+    videoSec: Number($("svidsec") && $("svidsec").value) || 20,
+    videoGap: Number($("svidgap") && $("svidgap").value) || 5,
   };
 }
 
@@ -593,6 +596,9 @@ function applyScreen(n) {
   sections = JSON.parse(JSON.stringify(b.sections || []));
   if ($("spx")) $("spx").value = b.pxW || 1920;
   if ($("spy")) $("spy").value = b.pxH || 1080;
+  if ($("svid")) $("svid").value = b.video || "";
+  if ($("svidsec")) $("svidsec").value = b.videoSec || 20;
+  if ($("svidgap")) $("svidgap").value = b.videoGap || 5;
   document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("on", t.getAttribute("data-scr") === activeScreen));
   paintStudio();
 }
