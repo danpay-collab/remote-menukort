@@ -5,10 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Skærmkort</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="stylesheet" href="style.css?v=8" />
+  <link rel="stylesheet" href="style.css?v=9" />
   <style>
     .studio:not(.hidden){display:grid!important;grid-template-columns:280px 1fr;grid-template-rows:64px 1fr;background:#efe8dc}
-    .studio-top{grid-column:1/-1;grid-row:1;display:flex;align-items:center;gap:14px;padding:0 16px;background:#1b1916;color:#f4efe6;border-bottom:1px solid #3a332b;z-index:5}
+    .studio-top{grid-column:1/-1;grid-row:1;display:flex;align-items:center;justify-content:flex-end;gap:14px;padding:0 16px;background:#1b1916;color:#f4efe6;border-bottom:1px solid #3a332b;z-index:5}
+    .studio-rail .who{display:flex;flex-direction:column;gap:4px;margin-bottom:8px;color:#f4efe6}
+    .studio-rail .who strong,.studio-rail .who .firm{color:#f4efe6;font-size:18px}
+    .studio-rail .who small{color:#cbbba6;font-size:15px}
     .studio-top .who{margin-right:auto;display:flex;gap:10px;align-items:baseline;color:#1b1713}
     .studio-top .who strong,.studio-top .who .firm{color:#f4efe6;font-size:18px}
     .studio-top .who small{color:#cbbba6;font-size:15px}
@@ -125,16 +128,16 @@
   </div>
   <div id="studio" class="studio hidden">
     <div class="studio-top">
-      <div class="who">
-        <strong>Menukort</strong>
-        <span id="stitle" class="firm"></span>
-        <small id="scvr"></small>
-      </div>
       <span id="sstatus" class="draft">Kladde</span>
       <button type="button" class="go" id="ssave">Send til TV</button>
       <button type="button" class="ghost" id="sclose">Luk</button>
     </div>
     <aside class="studio-rail">
+      <div class="who">
+        <strong>Menukort</strong>
+        <span id="stitle" class="firm"></span>
+        <small id="scvr"></small>
+      </div>
       <button type="button" class="ghost" id="saddcol">+ Ny kolonne</button>
       <p class="labs">Skærme</p>
       <label class="tick hid"><input type="checkbox" id="has1" checked />1</label>
