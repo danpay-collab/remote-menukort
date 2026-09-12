@@ -53,7 +53,7 @@ body.notick .board-tick { display: none; }
   font-family: Montserrat, Arial, sans-serif;
   font-weight: 800;
 }
-.name { text-transform: uppercase; font-size: calc(13px * var(--tv)); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.name { text-transform: uppercase; font-size: calc(13px * var(--tv)); white-space: normal; }
 .dots { border-bottom: 1px dotted #333; margin: 0 6px; min-width: 12px; flex: 1; }
 .line { display: flex; align-items: baseline; gap: 4px; }
 .price { font-weight: 800; white-space: nowrap; }
@@ -64,9 +64,8 @@ body.notick .board-tick { display: none; }
   font-weight: 400;
   font-family: Montserrat, Arial, sans-serif;
   color: #333;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  overflow: visible;
 }
 .badge { font-size: 11px; background: #f3d36a; padding: 1px 5px; border-radius: 8px; margin-left: 6px; }
 .board-tick {
@@ -77,4 +76,4 @@ body.notick .board-tick { display: none; }
 @keyframes tick { to { transform: translateX(-100%); } }
 .sizehead { font-size: 11px; font-weight: 700; color: #2f7a32; margin: 0 0 8px; gap: 0 8px; }
 .sizehead span { text-align: center; display: block; }
-.price { font-size: calc(11px * var(--tv)); text-align: center; min-width: 0; width: 58px; overflow: hidden; white-space: nowrap; }
+.price { font-size: calc(11px * var(--tv)); text-align: center; width: 48px; padding: 0; overflow: visible; white-space: nowrap; }

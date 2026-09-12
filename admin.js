@@ -547,16 +547,19 @@ async function openStudio() {
   }
   const maxS = Number(c.screenCount || (c.tvScreens && c.tvScreens.length) || 1);
   ["1","2","3","4","5"].forEach((n) => {
+    const on = Number(n) <= maxS;
     const el = $("has" + n);
     if (el) {
-      el.checked = Number(n) <= maxS;
-      el.disabled = Number(n) > maxS;
+      el.checked = on;
+      el.disabled = !on;
+      const lab = el.closest("label");
+      if (lab) lab.style.display = on ? "" : "none";
     }
-    document.querySelectorAll(".tab").forEach((t) => {
-      const sn = Number(t.getAttribute("data-scr"));
-      t.disabled = sn > maxS;
-      t.style.opacity = sn > maxS ? "0.35" : "1";
-    });
+  });
+  document.querySelectorAll(".tab").forEach((t) => {
+    const on = Number(t.getAttribute("data-scr")) <= maxS;
+    t.style.display = on ? "" : "none";
+    t.disabled = !on;
   });
   if (c.screenSetup && c.screenSetup[0]) {
     if (!boardsByScreen["1"]) boardsByScreen["1"] = { sections: [], pxW: 1920, pxH: 1080 };
