@@ -5,7 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Skærmkort</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=7" />
+  <style>
+    .studio:not(.hidden){display:grid!important;grid-template-columns:280px 1fr;grid-template-rows:58px 1fr;background:#efe8dc}
+    .studio-top{grid-column:1/-1;display:flex;align-items:center;gap:14px;padding:0 16px;background:#efe8dc;color:#1b1713;border-bottom:1px solid #d7cfc2}
+    .studio-top .who{margin-right:auto;display:flex;gap:10px;align-items:baseline;color:#1b1713}
+    .studio-top .who strong,.studio-top .who .firm{color:#1b1713;font-size:18px}
+    .studio-top .who small{color:#4a433a;font-size:15px}
+    .studio-top #ssave{background:#2f7a32!important;color:#fff!important;border:0;padding:10px 18px;border-radius:10px;font-weight:700}
+    .studio-top #sclose{background:#fff;color:#1b1713;border:1px solid #cfc6b8;padding:10px 16px;border-radius:10px}
+    .studio-rail{background:#1b1916;color:#f4efe6;padding:16px;overflow:auto;display:flex;flex-direction:column;gap:12px}
+    .studio-rail,.studio-rail label,.studio-rail p,.studio-rail .labs{color:#f4efe6!important;font-size:14px}
+    .studio-rail input,.studio-rail select{background:#2a2622!important;color:#f4efe6!important;border:1px solid #6a6358!important;width:100%;padding:8px;font-size:14px}
+    .studio-rail .ghost{background:#2a2622!important;color:#f4efe6!important;border:1px solid #6a6358!important}
+    .studio-rail .tab{min-width:42px;padding:8px;background:#2a2622;color:#f4efe6}
+    .studio-rail .tab.on{background:#c4a574;color:#1b1713}
+    #spx,#spy,#svid,#svidsec,#svidgap,#sscale{background:#2a2622!important;color:#f4efe6!important;border:1px solid #6a6358!important}
+    #ssave{background:#2f7a32!important;color:#fff!important}
+  </style>
 </head>
 <body class="admin">
   <div class="shell">
@@ -146,7 +163,8 @@
         </select>
       </label>
       <label class="tick"><input type="checkbox" id="sticker" /> Vis lysavis</label>
-      <label>Video-URL <input id="svid" placeholder="https://…mp4" /></label>
+      <label>Video-fil <input id="svidfile" type="file" accept="video/mp4,video/*" /></label>
+      <label>eller URL <input id="svid" placeholder="https://…mp4" /></label>
       <label>Varer <input id="svidsec" type="number" value="20" /> sek</label>
       <label>Hver <input id="svidgap" type="number" value="5" /> min</label>
       <button type="button" class="ghost" id="scopy">Kopiér til næste skærm</button>
@@ -179,6 +197,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.js"></script>

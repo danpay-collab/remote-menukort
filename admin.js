@@ -642,6 +642,8 @@ async function openStudio() {
     });
   }
   $("studio").classList.remove("hidden");
+  const rail = document.querySelector(".studio-rail");
+  if (rail) { rail.style.background = "#1b1916"; rail.style.color = "#f4efe6"; }
   $("stitle").textContent = c.name || currentId;
   if ($("scvr")) $("scvr").textContent = "CVR " + currentId;
   if ($("sticker")) $("sticker").checked = !!c.showTicker;
@@ -899,6 +901,25 @@ if ($("sfile")) {
 }
 if ($("sscanbtn") && $("sscan")) $("sscanbtn").addEventListener("click", () => $("sscan").click());
 if ($("sbgbtn") && $("sbg")) $("sbgbtn").addEventListener("click", () => $("sbg").click());
+if ($("svidfile")) {
+  $("svidfile").addEventListener("change", async (e) => {
+    const f = e.target.files && e.target.files[0];
+    if (!f || !currentId) return;
+    if (!firebase.storage) { alert("Video-upload kræver Firebase Storage."); return; }
+    $("stitle").textContent = "Uploader video…";
+    try {
+      const path = "videos/" + currentId + "/" + activeScreen + ".mp4";
+      const ref = firebase.storage().ref(path);
+      await ref.put(f);
+      const url = await ref.getDownloadURL();
+      if ($("svid")) $("svid").value = url;
+      $("stitle").textContent = currentId;
+      alert("Video lagt op. Send til TV.");
+    } catch (err) {
+      alert("Kunne ikke lægge video op: " + err.message);
+    }
+  });
+}
 function prepScan(file) {
   return new Promise((resolve, reject) => {
     const img = new Image();
