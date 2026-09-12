@@ -212,6 +212,7 @@ async function openCustomer(id) {
   const prev = $("preview");
   if (prev) prev.remove();
   const base = location.origin + location.pathname.replace(/admin.html.*/, "");
+  ensureCodes(c, id);
   const codes = (c.screenSetup || []).map((s) => "Skærm " + s.id + ": " + (s.code || "")).filter((x) => !x.endsWith(": "));
   $("tvurl").textContent = "Parring: " + base + "pair.html   " + (codes.join("  ") || "Ingen kode endnu");
   const box = $("pscreens");
@@ -259,6 +260,28 @@ function makePairCode() {
   let s = "";
   for (let i = 0; i < 4; i++) s += abc[Math.floor(Math.random() * abc.length)];
   return s;
+}
+function ensureCodes(c, id) {
+  const n = Number(c.screenCount || (c.tvScreens && c.tvScreens.length) || 1);
+  let setup = Array.isArray(c.screenSetup) ? c.screenSetup.slice() : [];
+  let changed = false;
+  for (let i = 1; i <= n; i++) {
+    let s = setup.find((x) => Number(x.id) === i);
+    if (!s) {
+      setup.push({ id: i, pxW: 1920, pxH: 1080, code: makePairCode() });
+      changed = true;
+    } else if (!s.code) {
+      s.code = makePairCode();
+      changed = true;
+    }
+  }
+  c.screenSetup = setup;
+  if (changed && db && id) {
+    db.collection("customers").doc(id).set({ screenSetup: setup }, { merge: true });
+    setup.forEach((s) => {
+      if (s.code) db.collection("pairs").doc(s.code).set({ cvr: id, screen: String(s.id), name: c.name || "" });
+    });
+  }
 }
 function guessPx(model) {
   const m = String(model || "").toUpperCase();
