@@ -27,6 +27,7 @@ function isNight(from, to) {
 
 function render(data) {
   document.getElementById("venue").textContent = "Menukort";
+  document.body.classList.toggle("notick", !data.showTicker);
   document.body.style.backgroundImage = data.bg ? "url(" + data.bg + ")" : "";
   document.body.style.backgroundSize = "cover";
   document.body.style.backgroundPosition = "center";

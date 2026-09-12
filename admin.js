@@ -242,11 +242,43 @@ $("placebtn").addEventListener("click", () => {
   placeMode = true;
   $("placehint").textContent = "Klik ét sted på kortet — der sættes kunden.";
 });
+function guessPx(model) {
+  const m = String(model || "").toUpperCase();
+  if (/65|75|55.*UHD|4K/.test(m)) return { w: 3840, h: 2160 };
+  return { w: 1920, h: 1080 };
+}
+function paintCscr() {
+  const n = Number($("cscreens") && $("cscreens").value) || 1;
+  const box = $("cscrrows");
+  if (!box) return;
+  box.innerHTML = "";
+  for (let i = 1; i <= n; i++) {
+    const row = document.createElement("div");
+    row.className = "scrline";
+    row.innerHTML = `<span>Skærm ${i}</span>
+      <input class="mod" placeholder="Samsung UE48…" />
+      <input class="pw" type="number" value="1920" />
+      <input class="ph" type="number" value="1080" />
+      <input class="note" placeholder="Ved kassen" />`;
+    row.querySelector(".mod").addEventListener("change", (e) => {
+      const g = guessPx(e.target.value);
+      row.querySelector(".pw").value = g.w;
+      row.querySelector(".ph").value = g.h;
+    });
+    box.appendChild(row);
+  }
+}
 $("newbtn").addEventListener("click", () => {
   $("panel").classList.add("hidden");
+  if ($("createwrap")) $("createwrap").classList.remove("hidden");
   $("create").classList.remove("hidden");
+  paintCscr();
 });
-$("closecreate").addEventListener("click", () => $("create").classList.add("hidden"));
+$("closecreate").addEventListener("click", () => {
+  $("create").classList.add("hidden");
+  if ($("createwrap")) $("createwrap").classList.add("hidden");
+});
+if ($("cscreens")) $("cscreens").addEventListener("change", paintCscr);
 async function lookupCvr(num) {
   const vat = String(num || "").replace(/[^0-9]/g, "");
   if (vat.length !== 8) throw new Error("CVR skal være 8 cifre.");
@@ -323,8 +355,18 @@ $("createbtn").addEventListener("click", async () => {
       footerNote: "",
       items: [],
       screens: {},
+      tvScreens: Array.from({ length: Number($("cscreens").value || 1) }, (_, i) => i + 1),
+      screenSetup: Array.from($("cscrrows") ? $("cscrrows").querySelectorAll(".scrline") : []).map((row, i) => ({
+        id: i + 1,
+        model: row.querySelector(".mod").value || "",
+        pxW: Number(row.querySelector(".pw").value) || 1920,
+        pxH: Number(row.querySelector(".ph").value) || 1080,
+        note: row.querySelector(".note").value || "",
+      })),
     }, { merge: true });
     $("cmsg").textContent = "Gemt. TV: display.html?id=" + cvr;
+    if ($("createwrap")) $("createwrap").classList.add("hidden");
+    $("create").classList.add("hidden");
     alert("Kunden er gemt: " + cvr);
   } catch (err) {
     $("cmsg").textContent = "Kunne ikke gemme: " + err.message;
@@ -503,14 +545,33 @@ async function openStudio() {
       pxH: c.pxH || 1080,
     };
   }
-  const on = c.tvScreens || [1];
+  const maxS = Number(c.screenCount || (c.tvScreens && c.tvScreens.length) || 1);
   ["1","2","3","4","5"].forEach((n) => {
     const el = $("has" + n);
-    if (el) el.checked = on.indexOf(Number(n)) >= 0;
+    if (el) {
+      el.checked = Number(n) <= maxS;
+      el.disabled = Number(n) > maxS;
+    }
+    document.querySelectorAll(".tab").forEach((t) => {
+      const sn = Number(t.getAttribute("data-scr"));
+      t.disabled = sn > maxS;
+      t.style.opacity = sn > maxS ? "0.35" : "1";
+    });
   });
+  if (c.screenSetup && c.screenSetup[0]) {
+    if (!boardsByScreen["1"]) boardsByScreen["1"] = { sections: [], pxW: 1920, pxH: 1080 };
+    c.screenSetup.forEach((s) => {
+      const id = String(s.id || "");
+      if (!id) return;
+      boardsByScreen[id] = boardsByScreen[id] || { sections: [], pxW: s.pxW, pxH: s.pxH };
+      boardsByScreen[id].pxW = s.pxW || boardsByScreen[id].pxW;
+      boardsByScreen[id].pxH = s.pxH || boardsByScreen[id].pxH;
+    });
+  }
   $("studio").classList.remove("hidden");
   $("stitle").textContent = c.name || currentId;
   if ($("scvr")) $("scvr").textContent = "CVR " + currentId;
+  if ($("sticker")) $("sticker").checked = !!c.showTicker;
   applyScreen("1");
 }
 
@@ -839,6 +900,7 @@ $("ssave").addEventListener("click", async () => {
       pxH: Number($("spy") && $("spy").value) || 1080,
       tvScreens: tvs.length ? tvs : [1],
       boardsByScreen,
+      showTicker: !!( $("sticker") && $("sticker").checked ),
     };
     if (pendingBg) payload.bg = pendingBg;
     await db.collection("customers").doc(currentId).set(payload, { merge: true });

@@ -173,3 +173,6 @@ input[hidden] { display: none !important; }
 .xlwiz { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 9000; display: flex; align-items: center; justify-content: center; }
 .xlwiz.hidden { display: none; }
 .xlbox { background: #fff; padding: 20px; border-radius: 12px; width: min(420px, 92vw); }
+.create-box { width: min(720px, 94vw); max-height: 90vh; overflow: auto; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; }
+.scrline { display: grid; grid-template-columns: 70px 1fr 80px 80px 1fr; gap: 6px; align-items: center; margin: 6px 0; }

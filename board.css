@@ -8,11 +8,13 @@ body.board {
   overflow: hidden;
 }
 .board-head {
-  display: flex; justify-content: space-between; align-items: flex-end;
-  padding: 10px 18px 6px; border-bottom: 2px solid #1a1a1a;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 4px 16px 4px; border-bottom: 1px solid #1a1a1a;
 }
-.board-head h1 { margin: 0; font-size: clamp(20px, 2.2vw, 32px); letter-spacing: .04em; }
-.board-head p { margin: 0; font-size: 13px; color: #3d7a3a; font-weight: 700; }
+.board-head h1 { margin: 0; font-size: clamp(16px, 1.6vw, 22px); letter-spacing: .04em; }
+.board-head p { margin: 0; font-size: 14px; color: #3d7a3a; font-weight: 700; }
+.head-right { display: flex; align-items: center; gap: 10px; }
+body.notick .board-tick { display: none; }
 .live { color: #3d7a3a; border: 1px solid #3d7a3a; border-radius: 999px; padding: 4px 8px; font-size: 11px; }
 .board-grid {
   flex: 1;

@@ -15,10 +15,11 @@
       <p id="cfgwarn" class="warn hidden">Indsæt Firebase-nøgler i firebase-config.js</p>
       <button type="button" class="ghost light" id="newbtn">+ Ny kunde</button>
       <button type="button" class="ghost light" id="seed">Opret testkunder</button>
-      <section class="side-form hidden" id="create">
+      <div id="createwrap" class="xlwiz hidden">
+      <section class="xlbox create-box" id="create">
         <h2>Ny kunde</h2>
+        <div class="grid2">
         <label>CVR-nummer <input id="cvr" placeholder="8 cifre" /></label>
-        <button type="button" class="ghost light" id="cvrbtn">Slå CVR op</button>
         <label>Firmanavn / pizzeria <input id="cname" /></label>
         <label>Adresse <input id="caddr" /></label>
         <label>Postnr. <input id="czip" maxlength="4" placeholder="5471" /></label>
@@ -34,12 +35,28 @@
             <option>Bornholm</option>
           </select>
         </label>
-        <label>Antal skærme <input id="cscreens" type="number" min="1" value="1" /></label>
         <label>Telefon <input id="cphone" /></label>
-        <button type="button" class="primary" id="createbtn">Gem kunde</button>
-        <button type="button" class="ghost light" id="closecreate">Annuller</button>
+        </div>
+        <button type="button" class="ghost" id="cvrbtn">Slå CVR op</button>
+        <h3>Skærme hos kunden</h3>
+        <label>Antal skærme
+          <select id="cscreens">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+          </select>
+        </label>
+        <div id="cscrrows"></div>
+        <p class="muted">Pixels kan du altid rette selv. Model er kun et forslag.</p>
+        <div class="row-between">
+          <button type="button" class="ghost" id="closecreate">Annuller</button>
+          <button type="button" class="primary" id="createbtn">Opret kunde</button>
+        </div>
         <p id="cmsg"></p>
       </section>
+      </div>
       <div id="list" class="cust-list"></div>
     </aside>
     <div class="main">
@@ -111,6 +128,7 @@
       <input type="file" id="sscan" accept="image/*" hidden />
       <button type="button" class="ghost" id="sbgbtn">Baggrund</button>
       <input type="file" id="sbg" accept="image/*" hidden />
+      <label class="tick"><input type="checkbox" id="sticker" /> Vis lysavis</label>
       <button type="button" class="ghost" id="scopy">Kopiér til næste skærm</button>
       <span id="sstatus" class="draft">Kladde — ikke sendt</span>
       <button type="button" class="ghost" id="sview">Vis menukort</button>

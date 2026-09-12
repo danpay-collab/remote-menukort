@@ -10,14 +10,14 @@
 </head>
 <body class="board">
   <header class="board-head">
-    <div>
+    <h1 id="venue">Menukort</h1>
+    <div class="head-right">
       <p id="clock"></p>
-      <h1 id="venue">Menukort</h1>
+      <span class="live">LIVE</span>
     </div>
-    <span class="live">LIVE</span>
   </header>
   <main id="board" class="board-grid"></main>
-  <footer class="board-tick"><span id="ticker"></span></footer>
+  <footer class="board-tick" id="tickwrap"><span id="ticker"></span></footer>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="firebase-config.js"></script>
