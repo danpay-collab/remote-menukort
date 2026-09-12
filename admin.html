@@ -114,21 +114,21 @@
       </div>
       <button type="button" class="ghost" id="saddcol">+ Ny kolonne</button>
       <span class="labs">Skærme</span>
-      <label class="tick"><input type="checkbox" id="has1" checked />1</label>
-      <label class="tick"><input type="checkbox" id="has2" />2</label>
-      <label class="tick"><input type="checkbox" id="has3" />3</label>
-      <label class="tick"><input type="checkbox" id="has4" />4</label>
-      <label class="tick"><input type="checkbox" id="has5" />5</label>
-      <button type="button" class="tab on" data-scr="1">Skærm 1</button>
-      <button type="button" class="tab" data-scr="2">Skærm 2</button>
-      <button type="button" class="tab" data-scr="3">Skærm 3</button>
-      <button type="button" class="tab" data-scr="4">Skærm 4</button>
-      <button type="button" class="tab" data-scr="5">Skærm 5</button>
+      <label class="tick hid"><input type="checkbox" id="has1" checked />1</label>
+      <label class="tick hid"><input type="checkbox" id="has2" />2</label>
+      <label class="tick hid"><input type="checkbox" id="has3" />3</label>
+      <label class="tick hid"><input type="checkbox" id="has4" />4</label>
+      <label class="tick hid"><input type="checkbox" id="has5" />5</label>
+      <span id="stabs" class="stabs">
+      <button type="button" class="tab on" data-scr="1">1</button>
+      <button type="button" class="tab" data-scr="2">2</button>
+      <button type="button" class="tab" data-scr="3">3</button>
+      <button type="button" class="tab" data-scr="4">4</button>
+      <button type="button" class="tab" data-scr="5">5</button>
+      </span>
       <label>Px <input id="spx" type="number" value="1920" style="width:90px" /> × <input id="spy" type="number" value="1080" style="width:90px" /></label>
-      <button type="button" class="ghost" id="sfilebtn">Upload Excel/Word/PDF</button>
-      <input type="file" id="sfile" accept=".xlsx,.xls,.csv,.docx,.pdf,.txt" hidden />
-      <button type="button" class="ghost" id="sscanbtn">Scan foto</button>
-      <input type="file" id="sscan" accept="image/*" hidden />
+      <button type="button" class="ghost" id="sfilebtn">Upload Excel</button>
+      <input type="file" id="sfile" accept=".xlsx,.xls,.csv" hidden />
       <button type="button" class="ghost" id="sbgbtn">Baggrund</button>
       <input type="file" id="sbg" accept="image/*" hidden />
       <label>TV-tekst
@@ -151,6 +151,10 @@
     <div class="xlbox">
       <h3>Sådan skal Excel læses</h3>
       <p id="xlhint"></p>
+      <label>Hvilken kolonne?
+        <select id="xlcol"><option value="ny">Ny kolonne</option></select>
+      </label>
+      <label>Start i nr. <input id="xlstart" placeholder="13" /></label>
       <label>Hvor mange priser?
         <select id="xlcount">
           <option value="1">1 pris</option>

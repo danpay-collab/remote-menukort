@@ -678,7 +678,23 @@ function openExcelWizard(rows) {
   const g = guessPriceCount(rows, heads);
   if ($("xlcount")) $("xlcount").value = String(g);
   if ($("xllabs")) $("xllabs").value = g === 5 ? "Alm, Deep pan, Familie, XL, XXL" : (g === 3 ? "Alm, Deep pan, Familie" : "Pris");
-  if ($("xlhint")) $("xlhint").textContent = "Fandt " + Math.max(0, rows.length - 1) + " linjer. Vælg antal priser og læg ind.";
+  const sel = $("xlcol");
+  if (sel) {
+    sel.innerHTML = '<option value="ny">Ny kolonne</option>';
+    sections.forEach((s, i) => {
+      const o = document.createElement("option");
+      o.value = String(i);
+      o.textContent = "Kolonne " + (i + 1) + (s.title ? " (" + s.title + ")" : "");
+      sel.appendChild(o);
+    });
+  }
+  let maxn = 0;
+  sections.forEach((s) => (s.items || []).forEach((it) => {
+    const v = Number(it.num);
+    if (v > maxn) maxn = v;
+  }));
+  if ($("xlstart")) $("xlstart").value = maxn ? String(maxn + 1) : "";
+  if ($("xlhint")) $("xlhint").textContent = "Fandt " + Math.max(0, rows.length - 1) + " linjer." + (maxn ? " Sidste nr. nu er " + maxn + "." : "");
   if ($("xlwiz")) $("xlwiz").classList.remove("hidden");
 }
 function applyExcelWizard() {
@@ -722,12 +738,21 @@ function applyExcelWizard() {
       nightAdd: "", lunchAdd: "",
     });
   });
+  const startAt = Number($("xlstart") && $("xlstart").value);
+  let seq = Number.isFinite(startAt) && startAt > 0 ? startAt : 0;
+  const dest = $("xlcol") && $("xlcol").value;
   Object.keys(groups).forEach((title) => {
-    sections.push({
-      title,
-      sizes: n === 1 ? [] : labels.slice(0, n),
-      items: groups[title],
+    const items = groups[title].map((it) => {
+      if (seq) { it.num = String(seq); seq += 1; }
+      return it;
     });
+    if (dest && dest !== "ny" && sections[Number(dest)]) {
+      const col = sections[Number(dest)];
+      col.items = (col.items || []).concat(items);
+      if (n > 1) col.sizes = labels.slice(0, n);
+    } else {
+      sections.push({ title, sizes: n === 1 ? [] : labels.slice(0, n), items });
+    }
   });
   paintStudio();
   if ($("sstatus")) $("sstatus").textContent = "Kladde — ikke sendt";
