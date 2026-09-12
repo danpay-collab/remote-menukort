@@ -213,8 +213,14 @@ async function openCustomer(id) {
   if (prev) prev.remove();
   const base = location.origin + location.pathname.replace(/admin.html.*/, "");
   ensureCodes(c, id);
-  const codes = (c.screenSetup || []).map((s) => "Skærm " + s.id + ": " + (s.code || "")).filter((x) => !x.endsWith(": "));
-  $("tvurl").textContent = "Parring: " + base + "pair.html   " + (codes.join("  ") || "Ingen kode endnu");
+  $("tvurl").textContent = "Åbn på TV: " + base + "pair.html";
+  const pc = $("paircodes");
+  if (pc) {
+    const list = c.screenSetup || [];
+    pc.innerHTML = list.map(function(s){
+      return "<div class=\"codepill\">Skærm " + s.id + " · <b>" + (s.code || "—") + "</b></div>";
+    }).join("") || "<div class=\"codepill\">Ingen kode</div>";
+  }
   const box = $("pscreens");
   const screens = c.screens || {};
   const keys = Object.keys(screens);

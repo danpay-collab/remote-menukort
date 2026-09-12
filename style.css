@@ -183,3 +183,5 @@ input[hidden] { display: none !important; }
 .studio-bar { flex-wrap: wrap; }
 
 .scrline input.code { width: 72px; font-weight: 700; letter-spacing: .12em; }
+
+.codepill { background:#1b1713; color:#f4efe6; padding:10px 12px; border-radius:10px; margin:6px 0; font-size:18px; letter-spacing:.08em; }
