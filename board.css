@@ -64,9 +64,8 @@ body.notick .board-tick { display: none; }
   font-weight: 400;
   font-family: Montserrat, Arial, sans-serif;
   color: #333;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  overflow: visible;
 }
 .badge { font-size: 11px; background: #f3d36a; padding: 1px 5px; border-radius: 8px; margin-left: 6px; }
 .board-tick {
@@ -83,4 +82,4 @@ body.hasbg .board-head h1 { color: #fff; text-shadow: 0 1px 4px #000; }
 .sz-sm { font-size: 10px; }
 
 .rowtop { display: grid; align-items: baseline; column-gap: 6px; }
-.row .desc { padding-left: 22px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
+.row .desc { padding-left: 18px; white-space: normal; overflow: visible; width: 100%; }

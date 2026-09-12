@@ -72,7 +72,7 @@ function render(data) {
         const sh = document.createElement("div");
         sh.className = "sizehead";
         sh.style.display = "grid";
-        sh.style.gridTemplateColumns = "22px 1fr repeat(" + sec.sizes.length + ", 44px)";
+        sh.style.gridTemplateColumns = "18px 1fr repeat(" + sec.sizes.length + ", 42px)";
         const labs = sec.sizes.map((s) => {
           const t = String(s || "");
           if (/fam/i.test(t)) return "Fam.";
@@ -94,7 +94,7 @@ function render(data) {
         const nS = (sec.sizes && sec.sizes.length > 1) ? sec.sizes.length : 1;
         const top = document.createElement("div");
         top.className = "rowtop";
-        top.style.gridTemplateColumns = nS > 1 ? ("22px 1fr repeat(" + nS + ", 44px)") : "22px 1fr 44px";
+        top.style.gridTemplateColumns = nS > 1 ? ("18px 1fr repeat(" + nS + ", 42px)") : "18px 1fr 42px";
         top.innerHTML = `<div class="num"></div><div class="line"><span class="name"></span></div>`;
         el.appendChild(top);
         el.querySelector(".num").textContent = it.num || "";

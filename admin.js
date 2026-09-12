@@ -74,10 +74,13 @@ function ago(ts) {
 }
 
 function initMap() {
-  map = L.map("map").setView([56.1, 10.4], 7);
+  const dk = L.latLngBounds([[54.45, 7.8], [57.85, 15.7]]);
+  map = L.map("map", { maxBounds: dk, minZoom: 6, maxBoundsViscosity: 1 });
+  map.setView([56.1, 10.4], 7);
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: "&copy; OpenStreetMap-bidragsydere",
   }).addTo(map);
+  map.setMaxBounds(dk);
   map.on("click", async (e) => {
     if (!placeMode || !db || !currentId) return;
     placeMode = false;
@@ -196,6 +199,7 @@ async function openCustomer(id) {
   $("ephone").value = c.phone || "";
   $("venue").value = c.venue || "";
   $("ticker").value = c.ticker || "";
+  if ($("etickon")) $("etickon").checked = !!c.showTicker;
   $("footerNote").value = c.footerNote || "";
   items = c.items || [];
   drawItems();
@@ -947,6 +951,7 @@ $("save").addEventListener("click", async () => {
       phone: $("ephone").value,
       venue: venue,
       ticker: $("ticker").value,
+      showTicker: !!( $("etickon") && $("etickon").checked ),
       footerNote: $("footerNote").value,
       items: items || [],
     };
