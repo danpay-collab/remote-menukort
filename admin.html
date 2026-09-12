@@ -107,32 +107,35 @@
     </div>
   </div>
   <div id="studio" class="studio hidden">
-    <div class="studio-bar">
+    <div class="studio-top">
       <div class="who">
         <strong>Menukort</strong>
         <span id="stitle" class="firm"></span>
         <small id="scvr"></small>
       </div>
+      <span id="sstatus" class="draft">Kladde</span>
+      <button type="button" class="go" id="ssave">Send til TV</button>
+      <button type="button" class="ghost" id="sclose">Luk</button>
+    </div>
+    <aside class="studio-rail">
       <button type="button" class="ghost" id="saddcol">+ Ny kolonne</button>
-      <span class="labs">Skærme</span>
+      <p class="labs">Skærme</p>
       <label class="tick hid"><input type="checkbox" id="has1" checked />1</label>
       <label class="tick hid"><input type="checkbox" id="has2" />2</label>
       <label class="tick hid"><input type="checkbox" id="has3" />3</label>
       <label class="tick hid"><input type="checkbox" id="has4" />4</label>
       <label class="tick hid"><input type="checkbox" id="has5" />5</label>
       <span id="stabs" class="stabs">
-      <button type="button" class="tab on" data-scr="1">1</button>
-      <button type="button" class="tab" data-scr="2">2</button>
-      <button type="button" class="tab" data-scr="3">3</button>
-      <button type="button" class="tab" data-scr="4">4</button>
-      <button type="button" class="tab" data-scr="5">5</button>
+        <button type="button" class="tab on" data-scr="1">1</button>
+        <button type="button" class="tab" data-scr="2">2</button>
+        <button type="button" class="tab" data-scr="3">3</button>
+        <button type="button" class="tab" data-scr="4">4</button>
+        <button type="button" class="tab" data-scr="5">5</button>
       </span>
-      <label>Px <input id="spx" type="number" value="1920" style="width:90px" /> × <input id="spy" type="number" value="1080" style="width:90px" /></label>
+      <p class="labs">Px</p>
+      <div class="pxrow"><input id="spx" type="number" value="1920" /> <input id="spy" type="number" value="1080" /></div>
       <button type="button" class="ghost" id="sfilebtn">Upload Excel</button>
       <input type="file" id="sfile" accept=".xlsx,.xls,.csv" hidden />
-      <label>Video-URL <input id="svid" placeholder="https://…mp4" style="width:180px" /></label>
-      <label>Varer <input id="svidsec" type="number" value="20" style="width:56px" /> sek</label>
-      <label>Hver <input id="svidgap" type="number" value="5" style="width:56px" /> min</label>
       <button type="button" class="ghost" id="sbgbtn">Baggrund</button>
       <input type="file" id="sbg" accept="image/*" hidden />
       <label>TV-tekst
@@ -143,12 +146,12 @@
         </select>
       </label>
       <label class="tick"><input type="checkbox" id="sticker" /> Vis lysavis</label>
+      <label>Video-URL <input id="svid" placeholder="https://…mp4" /></label>
+      <label>Varer <input id="svidsec" type="number" value="20" /> sek</label>
+      <label>Hver <input id="svidgap" type="number" value="5" /> min</label>
       <button type="button" class="ghost" id="scopy">Kopiér til næste skærm</button>
-      <span id="sstatus" class="draft">Kladde — ikke sendt</span>
       <button type="button" class="ghost" id="sview">Vis menukort</button>
-      <button type="button" class="go" id="ssave">Send til TV</button>
-      <button type="button" class="ghost" id="sclose">Luk</button>
-    </div>
+    </aside>
     <div id="scols" class="col-board"></div>
   </div>
   <div id="xlwiz" class="xlwiz hidden">
