@@ -74,12 +74,18 @@ function ago(ts) {
 }
 
 function initMap() {
-  const dk = L.latLngBounds([[54.45, 7.8], [57.85, 15.7]]);
-  map = L.map("map", { maxBounds: dk, minZoom: 6, maxBoundsViscosity: 1 });
-  map.setView([56.1, 10.4], 7);
+  const dk = L.latLngBounds([[54.55, 8.05], [57.80, 15.25]]);
+  map = L.map("map", {
+    maxBounds: dk,
+    minZoom: 7,
+    maxZoom: 18,
+    maxBoundsViscosity: 1,
+    worldCopyJump: false,
+  });
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: "&copy; OpenStreetMap-bidragsydere",
   }).addTo(map);
+  map.fitBounds(dk);
   map.setMaxBounds(dk);
   map.on("click", async (e) => {
     if (!placeMode || !db || !currentId) return;
