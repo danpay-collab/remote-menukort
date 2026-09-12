@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tilslut skærm</title>
+  <style>
+    html, body { height: 100%; margin: 0; background: #111; color: #fff; font-family: system-ui, sans-serif; }
+    body { display: flex; align-items: center; justify-content: center; }
+    .box { text-align: center; }
+    input { font-size: 42px; letter-spacing: .2em; text-align: center; width: 7em; text-transform: uppercase;
+      padding: 12px; border-radius: 12px; border: 0; }
+    p { color: #bbb; }
+    #err { color: #f87171; min-height: 1.2em; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>Skærmkort</h1>
+    <p>Tast koden fra installationen</p>
+    <input id="code" maxlength="4" autofocus />
+    <p id="err"></p>
+  </div>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script>
+    firebase.initializeApp(window.firebaseConfig);
+    const db = firebase.firestore();
+    const inp = document.getElementById("code");
+    const err = document.getElementById("err");
+    async function go() {
+      const code = inp.value.replace(/[^0-9a-z]/gi, "").toUpperCase();
+      if (code.length !== 4) return;
+      err.textContent = "Søger…";
+      try {
+        const snap = await db.collection("pairs").doc(code).get();
+        if (!snap.exists) { err.textContent = "Ukendt kode"; return; }
+        const p = snap.data();
+        location.replace("display.html?id=" + encodeURIComponent(p.cvr) + "&screen=" + encodeURIComponent(p.screen || "1"));
+      } catch (e) {
+        err.textContent = e.message;
+      }
+    }
+    inp.addEventListener("input", () => { if (inp.value.replace(/\s/g, "").length >= 4) go(); });
+    inp.addEventListener("keydown", (e) => { if (e.key === "Enter") go(); });
+  </script>
+</body>
+</html>

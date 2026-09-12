@@ -181,3 +181,5 @@ input[hidden] { display: none !important; }
 .stabs { display:inline-flex; gap:6px; }
 .stabs .tab { min-width:36px; }
 .studio-bar { flex-wrap: wrap; }
+
+.scrline input.code { width: 72px; font-weight: 700; letter-spacing: .12em; }

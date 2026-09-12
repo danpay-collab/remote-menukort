@@ -212,7 +212,8 @@ async function openCustomer(id) {
   const prev = $("preview");
   if (prev) prev.remove();
   const base = location.origin + location.pathname.replace(/admin.html.*/, "");
-  $("tvurl").textContent = "TV: " + base + "display.html?id=" + id;
+  const codes = (c.screenSetup || []).map((s) => "Skærm " + s.id + ": " + (s.code || "")).filter((x) => !x.endsWith(": "));
+  $("tvurl").textContent = "Parring: " + base + "pair.html   " + (codes.join("  ") || "Ingen kode endnu");
   const box = $("pscreens");
   const screens = c.screens || {};
   const keys = Object.keys(screens);
@@ -253,6 +254,12 @@ $("placebtn").addEventListener("click", () => {
   placeMode = true;
   $("placehint").textContent = "Klik ét sted på kortet — der sættes kunden.";
 });
+function makePairCode() {
+  const abc = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
+  let s = "";
+  for (let i = 0; i < 4; i++) s += abc[Math.floor(Math.random() * abc.length)];
+  return s;
+}
 function guessPx(model) {
   const m = String(model || "").toUpperCase();
   if (/65|75|55.*UHD|4K/.test(m)) return { w: 3840, h: 2160 };
@@ -270,7 +277,8 @@ function paintCscr() {
       <input class="mod" placeholder="Samsung UE48…" />
       <input class="pw" type="number" value="1920" />
       <input class="ph" type="number" value="1080" />
-      <input class="note" placeholder="Ved kassen" />`;
+      <input class="note" placeholder="Ved kassen" />
+      <input class="code" readonly value="${makePairCode()}" />`;
     row.querySelector(".mod").addEventListener("change", (e) => {
       const g = guessPx(e.target.value);
       row.querySelector(".pw").value = g.w;
@@ -380,9 +388,18 @@ $("createbtn").addEventListener("click", async () => {
         pxW: Number(row.querySelector(".pw").value) || 1920,
         pxH: Number(row.querySelector(".ph").value) || 1080,
         note: row.querySelector(".note").value || "",
+        code: (row.querySelector(".code") && row.querySelector(".code").value) || makePairCode(),
       })),
     }, { merge: true });
-    $("cmsg").textContent = "Gemt. TV: display.html?id=" + cvr;
+    const setups = (await db.collection("customers").doc(cvr).get()).data().screenSetup || [];
+    for (const s of setups) {
+      if (s.code) {
+        await db.collection("pairs").doc(s.code).set({
+          cvr: cvr, screen: String(s.id), name: $("cname").value || "",
+        });
+      }
+    }
+    $("cmsg").textContent = "Gemt. TV: pair.html  Kode: " + setups.map((s) => s.code).join(", ");
     if ($("createwrap")) $("createwrap").classList.add("hidden");
     $("create").classList.add("hidden");
     alert("Kunden er gemt: " + cvr);
