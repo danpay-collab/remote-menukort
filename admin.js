@@ -572,6 +572,7 @@ async function openStudio() {
   $("stitle").textContent = c.name || currentId;
   if ($("scvr")) $("scvr").textContent = "CVR " + currentId;
   if ($("sticker")) $("sticker").checked = !!c.showTicker;
+  if ($("sscale")) $("sscale").value = String(c.tvScale || 90);
   applyScreen("1");
 }
 
@@ -901,6 +902,7 @@ $("ssave").addEventListener("click", async () => {
       tvScreens: tvs.length ? tvs : [1],
       boardsByScreen,
       showTicker: !!( $("sticker") && $("sticker").checked ),
+      tvScale: Number($("sscale") && $("sscale").value) || 90,
     };
     if (pendingBg) payload.bg = pendingBg;
     await db.collection("customers").doc(currentId).set(payload, { merge: true });

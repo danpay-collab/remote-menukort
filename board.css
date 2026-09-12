@@ -47,22 +47,26 @@ body.notick .board-tick { display: none; }
   margin-top: 8px;
 }
 .sec.box h2 { color: #2f7a32; }
-.row { display: grid; grid-template-columns: 52px 1fr auto; gap: 6px; align-items: start; margin: 0 0 7px; }
+:root { --tv: 0.9; }
+.row { display: grid; grid-template-columns: 44px minmax(0,1fr) auto; gap: 4px; align-items: start; margin: 0 0 5px; overflow: hidden; }
 .num, .name, .price, .sec h2 {
   font-family: Montserrat, Arial, sans-serif;
   font-weight: 800;
 }
-.name { text-transform: uppercase; font-size: 1.05em; }
+.name { text-transform: uppercase; font-size: calc(13px * var(--tv)); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .dots { border-bottom: 1px dotted #333; margin: 0 6px; min-width: 12px; flex: 1; }
 .line { display: flex; align-items: baseline; gap: 4px; }
 .price { font-weight: 800; white-space: nowrap; }
 .desc {
-  margin: 2px 0 0;
-  font-size: 0.72em;
-  line-height: 1.2;
+  margin: 1px 0 0;
+  font-size: calc(11px * var(--tv));
+  line-height: 1.15;
   font-weight: 400;
   font-family: Montserrat, Arial, sans-serif;
   color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .badge { font-size: 11px; background: #f3d36a; padding: 1px 5px; border-radius: 8px; margin-left: 6px; }
 .board-tick {
@@ -73,4 +77,4 @@ body.notick .board-tick { display: none; }
 @keyframes tick { to { transform: translateX(-100%); } }
 .sizehead { font-size: 11px; font-weight: 700; color: #2f7a32; margin: 0 0 8px; gap: 0 8px; }
 .sizehead span { text-align: center; display: block; }
-.price { font-size: 13px; text-align: center; min-width: 58px; }
+.price { font-size: calc(12px * var(--tv)); text-align: center; min-width: 0; max-width: 64px; overflow: hidden; }

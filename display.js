@@ -28,6 +28,8 @@ function isNight(from, to) {
 function render(data) {
   document.getElementById("venue").textContent = "Menukort";
   document.body.classList.toggle("notick", !data.showTicker);
+  const tv = (Number(data.tvScale) || 90) / 100;
+  document.documentElement.style.setProperty("--tv", String(tv));
   document.body.style.backgroundImage = data.bg ? "url(" + data.bg + ")" : "";
   document.body.style.backgroundSize = "cover";
   document.body.style.backgroundPosition = "center";
@@ -36,9 +38,10 @@ function render(data) {
   const w = window.innerWidth || designed;
   const colN = (data.sections && data.sections.length) ? data.sections.length : 4;
   board.style.gridTemplateColumns = "repeat(" + colN + ", minmax(0, 1fr))";
-  const scale = Math.max(0.65, Math.min(1.1, w / designed));
-  document.documentElement.style.fontSize = (15 * scale) + "px";
-  board.style.fontSize = (12 * scale) + "px";
+  const tvN = (Number(data.tvScale) || 90) / 100;
+  const scale = Math.max(0.6, Math.min(1, w / designed)) * tvN;
+  document.documentElement.style.fontSize = (14 * scale) + "px";
+  board.style.fontSize = (11 * scale) + "px";
   board.innerHTML = "";
   const pack = data.boardsByScreen && data.boardsByScreen[String(SCREEN_ID)];
   let sections = (pack && pack.sections && pack.sections.length)
