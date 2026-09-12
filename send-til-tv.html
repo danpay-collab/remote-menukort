@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Send til TV</title>
+<style>
+    * { box-sizing: border-box; }
+    body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: Arial, Helvetica, sans-serif;
+        background: #111827;
+        color: #f3f4f6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+    }
+    .card {
+        width: min(720px, 100%);
+        background: #1f2937;
+        border-radius: 18px;
+        padding: 28px;
+        box-shadow: 0 18px 50px rgba(0,0,0,.35);
+    }
+    h1 { margin: 0 0 8px; font-size: 28px; }
+    .sub { color: #9ca3af; margin-bottom: 24px; }
+    label { display: block; margin-bottom: 8px; font-weight: 700; }
+    textarea, input {
+        width: 100%;
+        border: 1px solid #4b5563;
+        background: #111827;
+        color: #fff;
+        border-radius: 10px;
+        padding: 14px;
+        font-size: 16px;
+        outline: none;
+    }
+    textarea { min-height: 120px; resize: vertical; }
+    textarea:focus, input:focus { border-color: #60a5fa; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+    button {
+        border: 0;
+        border-radius: 10px;
+        padding: 14px 18px;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+    #sendBtn { background: #2563eb; color: white; }
+    #sendBtn:hover { background: #1d4ed8; }
+    #sendBtn:disabled { opacity: .5; cursor: not-allowed; }
+    #connectBtn { background: #374151; color: white; }
+    .status {
+        margin-top: 22px;
+        border-radius: 12px;
+        padding: 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: #374151;
+    }
+    .dot {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        flex: 0 0 16px;
+        background: #f59e0b;
+        box-shadow: 0 0 12px rgba(245,158,11,.55);
+    }
+    .dot.green { background: #22c55e; box-shadow: 0 0 14px rgba(34,197,94,.6); }
+    .dot.red { background: #ef4444; box-shadow: 0 0 14px rgba(239,68,68,.6); }
+    .dot.yellow { background: #f59e0b; }
+    .status-title { font-weight: 700; }
+    .status-detail { color: #d1d5db; margin-top: 3px; font-size: 14px; }
+    .settings {
+        margin-top: 24px;
+        padding-top: 20px;
+        border-top: 1px solid #374151;
+    }
+    .history {
+        margin-top: 24px;
+        max-height: 220px;
+        overflow: auto;
+    }
+    .history-item {
+        padding: 10px 0;
+        border-bottom: 1px solid #374151;
+        font-size: 14px;
+        word-break: break-all;
+    }
+    .history-time { color: #9ca3af; margin-right: 8px; }
+    .ok { color: #4ade80; }
+    .err { color: #f87171; }
+    .hint { color: #9ca3af; font-size: 13px; margin-top: 8px; line-height: 1.4; }
+    @media (max-width: 600px) {
+        .row { grid-template-columns: 1fr; }
+        .card { padding: 20px; }
+    }
+</style>
+</head>
+<body>
+<div class="card">
+    <h1>📺 Send til TV</h1>
+    <div class="sub">Send en URL eller et søgeord direkte til BrowseHere på TV'et.</div>
+
+    <label for="messageInput">URL eller søgeord</label>
+    <textarea id="messageInput" autofocus placeholder="F.eks. https://www.google.dk"></textarea>
+
+    <div class="row">
+        <button id="sendBtn">SEND TIL TV</button>
+        <button id="connectBtn">FORBIND IGEN</button>
+    </div>
+
+    <div class="status">
+        <div id="statusDot" class="dot yellow"></div>
+        <div>
+            <div id="statusTitle" class="status-title">Forbinder til TV...</div>
+            <div id="statusDetail" class="status-detail">ws://192.168.1.250:37457</div>
+        </div>
+    </div>
+
+    <div class="settings">
+        <label for="wsUrl">TV-forbindelse</label>
+        <input id="wsUrl" value="ws://192.168.1.250:37457" spellcheck="false">
+        <div class="hint">
+            Denne adresse er sat ud fra den WebSocket-forbindelse, vi fandt på dit TV.
+            Du kan ændre den senere, hvis TV'ets IP-adresse ændrer sig.
+        </div>
+    </div>
+
+    <div class="history">
+        <strong>Seneste afsendelser</strong>
+        <div id="historyList"></div>
+    </div>
+</div>
+
+<script>
+let websocket = null;
+let reconnectTimer = null;
+
+const messageInput = document.getElementById('messageInput');
+const sendBtn = document.getElementById('sendBtn');
+const connectBtn = document.getElementById('connectBtn');
+const wsUrl = document.getElementById('wsUrl');
+const statusDot = document.getElementById('statusDot');
+const statusTitle = document.getElementById('statusTitle');
+const statusDetail = document.getElementById('statusDetail');
+const historyList = document.getElementById('historyList');
+
+function setStatus(type, title, detail) {
+    statusDot.className = 'dot ' + type;
+    statusTitle.textContent = title;
+    statusDetail.textContent = detail;
+}
+
+function connect() {
+    clearTimeout(reconnectTimer);
+
+    if (websocket) {
+        try { websocket.close(); } catch (e) {}
+        websocket = null;
+    }
+
+    const address = wsUrl.value.trim();
+    if (!address) {
+        setStatus('red', 'Ingen forbindelse', 'Indtast WebSocket-adressen.');
+        return;
+    }
+
+    setStatus('yellow', 'Forbinder til TV...', address);
+    sendBtn.disabled = true;
+
+    try {
+        websocket = new WebSocket(address);
+
+        websocket.onopen = function() {
+            setStatus('green', 'TV-forbindelse OK', 'Forbindelsen er oprettet og klar til at sende.');
+            sendBtn.disabled = false;
+        };
+
+        websocket.onmessage = function(event) {
+            // Hvis TV/serveren sender et svar, viser vi det som en bekræftelse.
+            setStatus('green', 'TV har svaret', String(event.data));
+        };
+
+        websocket.onerror = function() {
+            setStatus('red', 'Forbindelsesfejl', 'Der opstod en fejl ved forbindelsen til TV’et.');
+            sendBtn.disabled = true;
+        };
+
+        websocket.onclose = function() {
+            sendBtn.disabled = true;
+            if (statusDot.classList.contains('green')) {
+                setStatus('red', 'Forbindelsen er lukket', 'TV-forbindelsen blev afbrudt.');
+            }
+            reconnectTimer = setTimeout(connect, 2500);
+        };
+    } catch (error) {
+        setStatus('red', 'Kunne ikke forbinde', error.message || 'Ukendt fejl.');
+    }
+}
+
+function addHistory(message, ok) {
+    const item = document.createElement('div');
+    item.className = 'history-item';
+
+    const time = new Date().toLocaleTimeString('da-DK', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    });
+
+    item.innerHTML =
+        '<span class="history-time">' + time + '</span>' +
+        '<span class="' + (ok ? 'ok' : 'err') + '">' +
+        (ok ? '✓ Sendt' : '✕ Fejl') +
+        '</span> ' +
+        escapeHtml(message);
+
+    historyList.prepend(item);
+
+    while (historyList.children.length > 20) {
+        historyList.removeChild(historyList.lastChild);
+    }
+}
+
+function escapeHtml(text) {
+    return text.replace(/[&<>"']/g, function(ch) {
+        return ({
+            '&':'&amp;',
+            '<':'&lt;',
+            '>':'&gt;',
+            '"':'&quot;',
+            "'":'&#039;'
+        })[ch];
+    });
+}
+
+function sendToTV() {
+    const message = messageInput.value.trim();
+
+    if (!message) {
+        setStatus('red', 'Intet at sende', 'Skriv en URL eller et søgeord først.');
+        messageInput.focus();
+        return;
+    }
+
+    if (message.length > 300) {
+        setStatus('red', 'For lang tekst', 'TV-løsningen accepterer højst 300 tegn.');
+        return;
+    }
+
+    if (!websocket || websocket.readyState !== WebSocket.OPEN) {
+        setStatus('red', 'TV er ikke forbundet', 'Forbindelsen er ikke åben. Prøver at forbinde igen.');
+        connect();
+        return;
+    }
+
+    try {
+        websocket.send(message);
+
+        // Dette bekræfter, at browseren har afleveret data til den åbne
+        // WebSocket-forbindelse. Det er ikke det samme som en server-ACK.
+        setStatus('green', '✓ Sendt til TV', 'Beskeden er afleveret til WebSocket-forbindelsen.');
+        addHistory(message, true);
+    } catch (error) {
+        setStatus('red', 'Afsendelse fejlede', error.message || 'Kunne ikke sende beskeden.');
+        addHistory(message, false);
+    }
+}
+
+sendBtn.addEventListener('click', sendToTV);
+connectBtn.addEventListener('click', connect);
+
+messageInput.addEventListener('keydown', function(event) {
+    if (event.ctrlKey && event.key === 'Enter') {
+        sendToTV();
+    }
+});
+
+// Start automatisk ved åbning.
+connect();
+</script>
+</body>
+</html>

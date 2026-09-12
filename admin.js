@@ -192,6 +192,7 @@ async function openCustomer(id) {
   $("ecity").value = c.city || "";
   $("eregion").value = REGIONS.includes(c.region) ? c.region : "Fyn";
   $("escreens").value = c.screenCount || 1;
+  if ($("ews")) $("ews").value = c.wsUrl || "";
   $("ephone").value = c.phone || "";
   $("venue").value = c.venue || "";
   $("ticker").value = c.ticker || "";
@@ -267,6 +268,12 @@ function paintCscr() {
     });
     box.appendChild(row);
   }
+}
+if ($("copytv")) {
+  $("copytv").addEventListener("click", () => {
+    const url = location.origin + location.pathname.replace("admin.html", "display.html") + "?id=" + currentId + "&screen=1";
+    navigator.clipboard.writeText(url).then(() => alert("Kopieret: " + url)).catch(() => prompt("Kopier", url));
+  });
 }
 $("newbtn").addEventListener("click", () => {
   $("panel").classList.add("hidden");
@@ -355,6 +362,7 @@ $("createbtn").addEventListener("click", async () => {
       footerNote: "",
       items: [],
       screens: {},
+      wsUrl: ($("cws") && $("cws").value) || "",
       tvScreens: Array.from({ length: Number($("cscreens").value || 1) }, (_, i) => i + 1),
       screenSetup: Array.from($("cscrrows") ? $("cscrrows").querySelectorAll(".scrline") : []).map((row, i) => ({
         id: i + 1,
@@ -935,6 +943,7 @@ $("save").addEventListener("click", async () => {
       city,
       region: $("eregion").value,
       screenCount: Number($("escreens").value || 1),
+      wsUrl: ($("ews") && $("ews").value) || "",
       phone: $("ephone").value,
       venue: venue,
       ticker: $("ticker").value,

@@ -48,7 +48,7 @@ body.notick .board-tick { display: none; }
 }
 .sec.box h2 { color: #2f7a32; }
 :root { --tv: 0.9; }
-.row { display: grid; grid-template-columns: 36px minmax(0,1fr) auto; gap: 4px; align-items: start; margin: 0 0 5px; overflow: hidden; }
+.row { display: grid; grid-template-columns: 26px minmax(0,1fr) auto; gap: 4px; align-items: start; margin: 0 0 5px; overflow: hidden; }
 .num, .name, .price, .sec h2 {
   font-family: Montserrat, Arial, sans-serif;
   font-weight: 800;

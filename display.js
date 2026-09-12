@@ -71,7 +71,7 @@ function render(data) {
         const sh = document.createElement("div");
         sh.className = "sizehead";
         sh.style.display = "grid";
-        sh.style.gridTemplateColumns = "32px minmax(0,1.4fr) repeat(" + sec.sizes.length + ", 48px)";
+        sh.style.gridTemplateColumns = "26px minmax(0,1fr) repeat(" + sec.sizes.length + ", 44px)";
         sh.innerHTML = "<span></span><span></span>" + sec.sizes.map((s, i) => "<span>" + s + (i < sec.sizes.length - 1 ? " ·" : "") + "</span>").join("");
         box.appendChild(sh);
       }
@@ -85,7 +85,7 @@ function render(data) {
         const el = document.createElement("article");
         el.className = "row";
         const nS = (sec.sizes && sec.sizes.length > 1) ? sec.sizes.length : 1;
-        el.style.gridTemplateColumns = nS > 1 ? ("32px minmax(0,1.4fr) repeat(" + nS + ", 48px)") : "32px minmax(0,1fr) 48px";
+        el.style.gridTemplateColumns = nS > 1 ? ("26px minmax(0,1fr) repeat(" + nS + ", 44px)") : "26px minmax(0,1fr) 44px";
         el.innerHTML = `<div class="num"></div><div><div class="line"><span class="name"></span></div><p class="desc"></p></div>`;
         el.querySelector(".num").textContent = it.num || "";
         el.querySelector(".name").textContent = it.name || "";
