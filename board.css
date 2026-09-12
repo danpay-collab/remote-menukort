@@ -64,8 +64,9 @@ body.notick .board-tick { display: none; }
   font-weight: 400;
   font-family: Montserrat, Arial, sans-serif;
   color: #333;
-  white-space: normal;
-  overflow: visible;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .badge { font-size: 11px; background: #f3d36a; padding: 1px 5px; border-radius: 8px; margin-left: 6px; }
 .board-tick {
@@ -77,3 +78,6 @@ body.notick .board-tick { display: none; }
 .sizehead { font-size: 11px; font-weight: 700; color: #2f7a32; margin: 0 0 8px; gap: 0 8px; }
 .sizehead span { text-align: center; display: block; }
 .price { font-size: calc(11px * var(--tv)); text-align: center; width: 48px; padding: 0; overflow: visible; white-space: nowrap; }
+
+body.hasbg .board-head h1 { color: #fff; text-shadow: 0 1px 4px #000; }
+.sz-sm { font-size: 10px; }

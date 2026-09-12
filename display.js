@@ -30,6 +30,7 @@ function render(data) {
   document.body.classList.toggle("notick", !data.showTicker);
   const tv = (Number(data.tvScale) || 90) / 100;
   document.documentElement.style.setProperty("--tv", String(tv));
+  document.body.classList.toggle("hasbg", !!data.bg);
   document.body.style.backgroundImage = data.bg ? "url(" + data.bg + ")" : "";
   document.body.style.backgroundSize = "cover";
   document.body.style.backgroundPosition = "center";
@@ -72,7 +73,13 @@ function render(data) {
         sh.className = "sizehead";
         sh.style.display = "grid";
         sh.style.gridTemplateColumns = "26px minmax(0,1fr) repeat(" + sec.sizes.length + ", 44px)";
-        sh.innerHTML = "<span></span><span></span>" + sec.sizes.map((s, i) => "<span>" + s + (i < sec.sizes.length - 1 ? " ·" : "") + "</span>").join("");
+        const labs = sec.sizes.map((s) => {
+          const t = String(s || "");
+          if (/fam/i.test(t)) return "Fam.";
+          if (/alm/i.test(t)) return "Alm.";
+          return t;
+        });
+        sh.innerHTML = "<span></span><span></span>" + labs.map((s, i) => "<span class=\"" + (/deep/i.test(String(sec.sizes[i]||"")) ? "sz-sm" : "") + "\">" + s + (i < labs.length - 1 ? " ·" : "") + "</span>").join("");
         box.appendChild(sh);
       }
       if (sec.note) {
