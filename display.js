@@ -72,7 +72,7 @@ function render(data) {
         const sh = document.createElement("div");
         sh.className = "sizehead";
         sh.style.display = "grid";
-        sh.style.gridTemplateColumns = "26px minmax(0,1fr) repeat(" + sec.sizes.length + ", 44px)";
+        sh.style.gridTemplateColumns = "22px 1fr repeat(" + sec.sizes.length + ", 44px)";
         const labs = sec.sizes.map((s) => {
           const t = String(s || "");
           if (/fam/i.test(t)) return "Fam.";
@@ -92,11 +92,13 @@ function render(data) {
         const el = document.createElement("article");
         el.className = "row";
         const nS = (sec.sizes && sec.sizes.length > 1) ? sec.sizes.length : 1;
-        el.style.gridTemplateColumns = nS > 1 ? ("26px minmax(0,1fr) repeat(" + nS + ", 44px)") : "26px minmax(0,1fr) 44px";
-        el.innerHTML = `<div class="num"></div><div><div class="line"><span class="name"></span></div><p class="desc"></p></div>`;
+        const top = document.createElement("div");
+        top.className = "rowtop";
+        top.style.gridTemplateColumns = nS > 1 ? ("22px 1fr repeat(" + nS + ", 44px)") : "22px 1fr 44px";
+        top.innerHTML = `<div class="num"></div><div class="line"><span class="name"></span></div>`;
+        el.appendChild(top);
         el.querySelector(".num").textContent = it.num || "";
         el.querySelector(".name").textContent = it.name || "";
-        el.querySelector(".desc").textContent = it.desc || "";
         const base = Number(String(it.price || "").replace(",", "."));
         const lunchOn = Number(it.lunchAdd || 0) && isNight(it.lunchFrom || "11:00", it.lunchTo || "15:00");
         const nightOn = Number(it.nightAdd || 0) && isNight(it.nightFrom || "22:00", it.nightTo || "05:00");
@@ -114,7 +116,13 @@ function render(data) {
             const n = Number(String(p).replace(",", "."));
             cell.textContent = (Number.isFinite(n) ? String(n + add).replace(/\.0$/, "") : p) + ",-";
           }
-          el.appendChild(cell);
+          top.appendChild(cell);
+        }
+        if (it.desc) {
+          const d = document.createElement("p");
+          d.className = "desc";
+          d.textContent = it.desc;
+          el.appendChild(d);
         }
         if (add) {
           const n = document.createElement("span");
