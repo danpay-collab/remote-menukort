@@ -91,9 +91,9 @@ function render(data) {
       v.src = videos[window._promo.i % videos.length];
       window._promo.i += 1;
       v.autoplay = true;
-      v.muted = true;
-      v.defaultMuted = true;
-      v.volume = 0;
+      v.muted = false;
+      v.defaultMuted = false;
+      v.volume = 1;
       v.playsInline = true;
       v.controls = false;
       v.disablePictureInPicture = true;

@@ -797,13 +797,13 @@ function applyExcelWizard() {
     });
   });
   const startAt = Number($("xlstart") && $("xlstart").value);
-  let seq = Number.isFinite(startAt) && startAt > 0 ? startAt : 0;
   const dest = $("xlcol") && $("xlcol").value;
   Object.keys(groups).forEach((title) => {
-    const items = groups[title].map((it) => {
-      if (seq) { it.num = String(seq); seq += 1; }
-      return it;
-    });
+    let items = groups[title];
+    if (Number.isFinite(startAt) && startAt > 0) {
+      const hit = items.findIndex((it) => Number(it.num) === startAt);
+      items = hit >= 0 ? items.slice(hit) : items.slice(Math.max(0, startAt - 1));
+    }
     if (dest && dest !== "ny" && sections[Number(dest)]) {
       const col = sections[Number(dest)];
       col.items = (col.items || []).concat(items);
