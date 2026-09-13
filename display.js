@@ -265,7 +265,22 @@ if (cfg && cfg.apiKey !== "INDSÆT") {
   firebase.initializeApp(cfg);
   const db = firebase.firestore();
   const ref = db.collection("customers").doc(CUSTOMER_ID);
-  ref.onSnapshot((snap) => { if (snap.exists) { lastMenu = snap.data(); render(lastMenu); } });
+  ref.onSnapshot((snap) => {
+    if (!snap.exists) return;
+    lastMenu = snap.data();
+    const b = String(lastMenu.bump || "");
+    const seen = sessionStorage.getItem("skaermBump") || "";
+    if (b && seen && b !== seen) {
+      sessionStorage.setItem("skaermBump", b);
+      const c = document.createElement("div");
+      c.style.cssText = "position:fixed;inset:0;background:#000;z-index:99";
+      document.body.appendChild(c);
+      setTimeout(function () { location.reload(); }, 2500);
+      return;
+    }
+    if (b && !seen) sessionStorage.setItem("skaermBump", b);
+    render(lastMenu);
+  });
   async function beat() {
     await ref.set({
       screens: { [SCREEN_ID]: { label: "Skærm 1", lastSeen: firebase.firestore.FieldValue.serverTimestamp() } },

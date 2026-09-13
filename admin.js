@@ -1101,12 +1101,13 @@ $("ssave").addEventListener("click", async () => {
       videoTextOn3: !!(boardsByScreen[activeScreen] && boardsByScreen[activeScreen].videoTextOn3),
       showTicker: !!( $("sticker") && $("sticker").checked ),
       tvScale: Number($("sscale") && $("sscale").value) || 90,
+      bump: Date.now(),
     };
     if (pendingBg) payload.bg = pendingBg;
     await db.collection("customers").doc(currentId).set(payload, { merge: true });
     if ($("sstatus")) { $("sstatus").textContent = "Live"; $("sstatus").className = "live"; }
     $("studio").classList.add("hidden");
-    alert("Sendt til TV. Genindlæs skærmen.");
+    alert("Sendt til infoskærm. Skærmen opdaterer selv.");
   } catch (err) {
     alert("Kunne ikke sende: " + err.message);
   }
