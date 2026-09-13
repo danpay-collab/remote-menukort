@@ -58,30 +58,49 @@ function render(data) {
   if (video && window._promo.url !== video + videoSec + videoGap) {
     window._promo.url = video + videoSec + videoGap;
     clearInterval(window._promo.timer);
+    function cover(on) {
+      let c = document.getElementById("tvcover");
+      if (!c) {
+        c = document.createElement("div");
+        c.id = "tvcover";
+        Object.assign(c.style, {
+          position: "fixed", inset: "0", background: "#000", zIndex: "40",
+          opacity: "1", transition: "opacity .5s ease", pointerEvents: "none"
+        });
+        document.body.appendChild(c);
+      }
+      c.style.opacity = on ? "1" : "0";
+      if (!on) setTimeout(function () { if (c.parentNode) c.remove(); }, 550);
+    }
     function showPromo() {
       let v = document.getElementById("tvvid");
       if (v) v.remove();
+      cover(true);
       v = document.createElement("video");
       v.id = "tvvid";
       v.src = video;
       v.autoplay = true;
       v.muted = true;
+      v.defaultMuted = true;
+      v.volume = 0;
       v.playsInline = true;
       v.controls = false;
       v.disablePictureInPicture = true;
       Object.assign(v.style, {
         position: "fixed", inset: "0", width: "100%", height: "100%", objectFit: "cover",
-        zIndex: "20", background: "#000", opacity: "0", transition: "opacity .45s ease"
+        zIndex: "20", background: "#000"
       });
       document.body.appendChild(v);
-      v.play().catch(() => {});
-      requestAnimationFrame(function () { v.style.opacity = "1"; });
+      v.play().catch(function () {});
+      setTimeout(function () { cover(false); }, 600);
       const hold = Math.max(3, videoSec) * 1000;
       setTimeout(function () {
-        const x = document.getElementById("tvvid");
-        if (!x) return;
-        x.style.opacity = "0";
-        setTimeout(function () { if (x.parentNode) x.remove(); }, 500);
+        cover(true);
+        setTimeout(function () {
+          const x = document.getElementById("tvvid");
+          if (x) x.remove();
+          cover(false);
+        }, 500);
       }, hold);
     }
     showPromo();
