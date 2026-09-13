@@ -187,9 +187,10 @@
     <div id="scols" class="col-board"></div>
   </div>
   <div id="vidwiz" class="xlwiz hidden">
-    <div class="xlbox" style="background:#1b1916;color:#f4efe6;max-width:720px">
+    <div class="xlbox" style="background:#1b1916;color:#f4efe6;max-width:960px;max-height:86vh;overflow:auto;display:flex;gap:16px;align-items:flex-start">
+      <div style="flex:1;min-width:0">
       <h3>Videoer</h3>
-      <p>Vælg fil — adressen udfyldes. Lyd: blå flueben.</p>
+      <p>Vælg fil — adressen udfyldes. Lyd og tekst: flueben.</p>
       <label>Video 1 <input id="vw1" placeholder="https://…" /></label>
       <div style="display:flex;gap:8px;align-items:center;margin:6px 0 12px">
         <button type="button" class="ghost" id="vw1f">Vælg fil</button>
@@ -218,11 +219,12 @@
       </div>
       <input id="vw3txt" placeholder="Tekst på video 3" />
       <label>Hver <input id="vwgap" type="number" value="5" style="width:64px" /> min · varer <input id="vwsec" type="number" value="20" style="width:64px" /> sek</label>
-      <video id="vwprev" controls style="width:100%;max-height:200px;margin-top:10px;display:none;background:#000"></video>
       <div class="actions" style="margin-top:12px">
         <button type="button" class="ghost" id="vwcancel">Annuller</button>
         <button type="button" class="go" id="vwsave">Gem</button>
       </div>
+      </div>
+      <video id="vwprev" controls style="width:320px;max-height:240px;flex-shrink:0;background:#000;position:sticky;top:0"></video>
     </div>
   </div>
   <div id="xlwiz" class="xlwiz hidden">

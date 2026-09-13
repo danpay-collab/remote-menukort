@@ -958,6 +958,7 @@ if ($("vwsave")) {
     if ($("svidsec")) $("svidsec").value = ($("vwsec") && $("vwsec").value) || 20;
     if ($("svidgap")) $("svidgap").value = ($("vwgap") && $("vwgap").value) || 5;
     if ($("vidwiz")) $("vidwiz").classList.add("hidden");
+    if (typeof stashScreen === "function") stashScreen();
   });
 }
 async function uploadSlot(slot, file) {
@@ -1089,6 +1090,15 @@ $("ssave").addEventListener("click", async () => {
       pxH: Number($("spy") && $("spy").value) || 1080,
       tvScreens: tvs.length ? tvs : [1],
       boardsByScreen,
+      video: (boardsByScreen[activeScreen] && boardsByScreen[activeScreen].video) || "",
+      video2: (boardsByScreen[activeScreen] && boardsByScreen[activeScreen].video2) || "",
+      video3: (boardsByScreen[activeScreen] && boardsByScreen[activeScreen].video3) || "",
+      videoText: (boardsByScreen[activeScreen] && boardsByScreen[activeScreen].videoText) || "",
+      videoText2: (boardsByScreen[activeScreen] && boardsByScreen[activeScreen].videoText2) || "",
+      videoText3: (boardsByScreen[activeScreen] && boardsByScreen[activeScreen].videoText3) || "",
+      videoTextOn: !!(boardsByScreen[activeScreen] && boardsByScreen[activeScreen].videoTextOn),
+      videoTextOn2: !!(boardsByScreen[activeScreen] && boardsByScreen[activeScreen].videoTextOn2),
+      videoTextOn3: !!(boardsByScreen[activeScreen] && boardsByScreen[activeScreen].videoTextOn3),
       showTicker: !!( $("sticker") && $("sticker").checked ),
       tvScale: Number($("sscale") && $("sscale").value) || 90,
     };
