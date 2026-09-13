@@ -45,18 +45,28 @@ function render(data) {
   board.style.fontSize = (11 * scale) + "px";
   board.innerHTML = "";
   const pack = data.boardsByScreen && data.boardsByScreen[String(SCREEN_ID)];
-  let video = (pack && pack.video) || data.video || "";
-  if (video.indexOf("github.com/") >= 0 && video.indexOf("/blob/") >= 0) {
-    const parts = video.split("/blob/");
-    const repo = parts[0].replace("https://github.com/", "").replace("http://github.com/", "");
-    const file = (parts[1] || "").replace(/^[^/]+\//, "");
-    video = "https://" + repo.split("/")[0] + ".github.io/" + repo.split("/")[1] + "/" + file;
+  function fixVid(u) {
+    u = String(u || "").trim();
+    if (u.indexOf("github.com/") >= 0 && u.indexOf("/blob/") >= 0) {
+      const parts = u.split("/blob/");
+      const repo = parts[0].replace("https://github.com/", "").replace("http://github.com/", "");
+      const file = (parts[1] || "").replace(/^[^/]+\//, "");
+      u = "https://" + repo.split("/")[0] + ".github.io/" + repo.split("/")[1] + "/" + file;
+    }
+    return u;
   }
+  const videos = [
+    fixVid((pack && pack.video) || data.video || ""),
+    fixVid((pack && pack.video2) || data.video2 || ""),
+    fixVid((pack && pack.video3) || data.video3 || ""),
+  ].filter(Boolean);
+  let video = videos[0] || "";
   const videoSec = Number((pack && pack.videoSec) || data.videoSec || 20);
   const videoGap = Number((pack && pack.videoGap) || data.videoGap || 5);
-  window._promo = window._promo || { url: "", timer: null };
-  if (video && window._promo.url !== video + videoSec + videoGap) {
-    window._promo.url = video + videoSec + videoGap;
+  window._promo = window._promo || { url: "", timer: null, i: 0 };
+  if (videos.length && window._promo.url !== videos.join("|") + videoSec + videoGap) {
+    window._promo.url = videos.join("|") + videoSec + videoGap;
+    window._promo.i = 0;
     clearInterval(window._promo.timer);
     function cover(on) {
       let c = document.getElementById("tvcover");
@@ -78,7 +88,8 @@ function render(data) {
       cover(true);
       v = document.createElement("video");
       v.id = "tvvid";
-      v.src = video;
+      v.src = videos[window._promo.i % videos.length];
+      window._promo.i += 1;
       v.autoplay = true;
       v.muted = true;
       v.defaultMuted = true;
@@ -106,7 +117,7 @@ function render(data) {
     showPromo();
     window._promo.timer = setInterval(showPromo, Math.max(1, videoGap) * 60 * 1000);
   }
-  if (!video) {
+  if (!videos.length) {
     window._promo.url = "";
     clearInterval(window._promo.timer);
     const x = document.getElementById("tvvid");

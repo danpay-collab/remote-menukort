@@ -585,6 +585,8 @@ function stashScreen() {
     pxW: Number($("spx") && $("spx").value) || 1920,
     pxH: Number($("spy") && $("spy").value) || 1080,
     video: ($("svid") && $("svid").value) || "",
+    video2: ($("svid2") && $("svid2").value) || "",
+    video3: ($("svid3") && $("svid3").value) || "",
     videoSec: Number($("svidsec") && $("svidsec").value) || 20,
     videoGap: Number($("svidgap") && $("svidgap").value) || 5,
   };
@@ -597,6 +599,8 @@ function applyScreen(n) {
   if ($("spx")) $("spx").value = b.pxW || 1920;
   if ($("spy")) $("spy").value = b.pxH || 1080;
   if ($("svid")) $("svid").value = b.video || "";
+  if ($("svid2")) $("svid2").value = b.video2 || "";
+  if ($("svid3")) $("svid3").value = b.video3 || "";
   if ($("svidsec")) $("svidsec").value = b.videoSec || 20;
   if ($("svidgap")) $("svidgap").value = b.videoGap || 5;
   document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("on", t.getAttribute("data-scr") === activeScreen));
