@@ -44,7 +44,8 @@ function render(data) {
   document.documentElement.style.fontSize = (14 * scale) + "px";
   board.style.fontSize = (11 * scale) + "px";
   board.innerHTML = "";
-  const pack = data.boardsByScreen && data.boardsByScreen[String(SCREEN_ID)];
+  const bmap = data.boardsByScreen || {};
+  const pack = bmap[String(SCREEN_ID)] || bmap[SCREEN_ID] || bmap["1"] || bmap[1] || {};
   function fixVid(u) {
     u = String(u || "").trim();
     if (u.indexOf("github.com/") >= 0 && u.indexOf("/blob/") >= 0) {
@@ -55,21 +56,38 @@ function render(data) {
     }
     return u;
   }
+  function grab(obj, k) { return obj && obj[k] ? obj[k] : ""; }
+  const sources = [data, pack];
+  Object.keys(bmap).forEach(function (k) { sources.push(bmap[k]); });
+  function first(key) {
+    for (let i = 0; i < sources.length; i++) {
+      const v = grab(sources[i], key);
+      if (v) return v;
+    }
+    return "";
+  }
+  function onTxt(k) {
+    const v = first(k);
+    return v === true || v === "true" || v === "1";
+  }
   const rawList = [
-    { u: fixVid((pack && pack.video) || data.video || ""), s: !!(pack && pack.videoSound) },
-    { u: fixVid((pack && pack.video2) || data.video2 || ""), s: !!(pack && pack.videoSound2) },
-    { u: fixVid((pack && pack.video3) || data.video3 || ""), s: !!(pack && pack.videoSound3) },
+    { u: fixVid(first("video")), s: onTxt("videoSound"), t: onTxt("videoTextOn") ? first("videoText") : "" },
+    { u: fixVid(first("video2")), s: onTxt("videoSound2"), t: onTxt("videoTextOn2") ? first("videoText2") : "" },
+    { u: fixVid(first("video3")), s: onTxt("videoSound3"), t: onTxt("videoTextOn3") ? first("videoText3") : "" },
   ].filter(function (x) { return x.u; });
   const videos = rawList.map(function (x) { return x.u; });
   const vidSound = rawList.map(function (x) { return x.s; });
+  const vidText = rawList.map(function (x) { return x.t || ""; });
   let video = videos[0] || "";
   const videoSec = Number((pack && pack.videoSec) || data.videoSec || 20);
   const videoGap = Number((pack && pack.videoGap) || data.videoGap || 5);
   window._promo = window._promo || { url: "", timer: null, i: 0 };
-  if (videos.length && window._promo.url !== videos.join("|") + videoSec + videoGap) {
-    window._promo.url = videos.join("|") + videoSec + videoGap;
+  const promoKey = videos.join("|") + "|" + videoSec + "|" + videoGap;
+  if (videos.length && window._promo.url !== promoKey) {
+    window._promo.url = promoKey;
     window._promo.i = 0;
     clearInterval(window._promo.timer);
+    clearTimeout(window._promo.wait);
     function cover(on) {
       let c = document.getElementById("tvcover");
       if (!c) {
@@ -106,6 +124,21 @@ function render(data) {
         zIndex: "20", background: "#000"
       });
       document.body.appendChild(v);
+      let cap = document.getElementById("tvcap");
+      if (cap) cap.remove();
+      const line = (vidText && vidText[ix]) || "";
+      if (line) {
+        cap = document.createElement("div");
+        cap.id = "tvcap";
+        cap.textContent = line;
+        Object.assign(cap.style, {
+          position: "fixed", left: "0", right: "0", bottom: "6vh", zIndex: "45",
+          textAlign: "center", color: "#fff", fontFamily: "Montserrat, sans-serif",
+          fontWeight: "800", fontSize: "3.2vw", letterSpacing: ".04em",
+          textShadow: "0 2px 12px #000", pointerEvents: "none"
+        });
+        document.body.appendChild(cap);
+      }
       v.play().catch(function () {});
       setTimeout(function () { cover(false); }, 600);
       const hold = Math.max(3, videoSec) * 1000;
@@ -114,18 +147,15 @@ function render(data) {
         setTimeout(function () {
           const x = document.getElementById("tvvid");
           if (x) x.remove();
+          const c2 = document.getElementById("tvcap");
+          if (c2) c2.remove();
           cover(false);
+          const wait = Math.max(1, videoGap) * 60 * 1000;
+          window._promo.wait = setTimeout(showPromo, wait);
         }, 500);
       }, hold);
     }
     showPromo();
-    window._promo.timer = setInterval(showPromo, Math.max(1, videoGap) * 60 * 1000);
-  }
-  if (!videos.length) {
-    window._promo.url = "";
-    clearInterval(window._promo.timer);
-    const x = document.getElementById("tvvid");
-    if (x) x.remove();
   }
   let sections = (pack && pack.sections && pack.sections.length)
     ? pack.sections

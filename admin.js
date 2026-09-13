@@ -590,6 +590,12 @@ function stashScreen() {
     videoSound: ($("svidlyd") && $("svidlyd").value) === "1",
     videoSound2: ($("svidlyd2") && $("svidlyd2").value) === "1",
     videoSound3: ($("svidlyd3") && $("svidlyd3").value) === "1",
+    videoText: ($("svidtxt") && $("svidtxt").value) || "",
+    videoText2: ($("svidtxt2") && $("svidtxt2").value) || "",
+    videoText3: ($("svidtxt3") && $("svidtxt3").value) || "",
+    videoTextOn: ($("svidton") && $("svidton").value) === "1",
+    videoTextOn2: ($("svidton2") && $("svidton2").value) === "1",
+    videoTextOn3: ($("svidton3") && $("svidton3").value) === "1",
     videoSec: Number($("svidsec") && $("svidsec").value) || 20,
     videoGap: Number($("svidgap") && $("svidgap").value) || 5,
   };
@@ -607,6 +613,12 @@ function applyScreen(n) {
   if ($("svidlyd")) $("svidlyd").value = b.videoSound ? "1" : "0";
   if ($("svidlyd2")) $("svidlyd2").value = b.videoSound2 ? "1" : "0";
   if ($("svidlyd3")) $("svidlyd3").value = b.videoSound3 ? "1" : "0";
+  if ($("svidtxt")) $("svidtxt").value = b.videoText || "";
+  if ($("svidtxt2")) $("svidtxt2").value = b.videoText2 || "";
+  if ($("svidtxt3")) $("svidtxt3").value = b.videoText3 || "";
+  if ($("svidton")) $("svidton").value = b.videoTextOn ? "1" : "0";
+  if ($("svidton2")) $("svidton2").value = b.videoTextOn2 ? "1" : "0";
+  if ($("svidton3")) $("svidton3").value = b.videoTextOn3 ? "1" : "0";
   if ($("svidsec")) $("svidsec").value = b.videoSec || 20;
   if ($("svidgap")) $("svidgap").value = b.videoGap || 5;
   document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("on", t.getAttribute("data-scr") === activeScreen));
@@ -917,6 +929,12 @@ if ($("svidbtn")) {
     if ($("vw1l")) $("vw1l").checked = ($("svidlyd") && $("svidlyd").value) === "1";
     if ($("vw2l")) $("vw2l").checked = ($("svidlyd2") && $("svidlyd2").value) === "1";
     if ($("vw3l")) $("vw3l").checked = ($("svidlyd3") && $("svidlyd3").value) === "1";
+    if ($("vw1t")) $("vw1t").checked = ($("svidton") && $("svidton").value) === "1";
+    if ($("vw2t")) $("vw2t").checked = ($("svidton2") && $("svidton2").value) === "1";
+    if ($("vw3t")) $("vw3t").checked = ($("svidton3") && $("svidton3").value) === "1";
+    if ($("vw1txt")) $("vw1txt").value = ($("svidtxt") && $("svidtxt").value) || "";
+    if ($("vw2txt")) $("vw2txt").value = ($("svidtxt2") && $("svidtxt2").value) || "";
+    if ($("vw3txt")) $("vw3txt").value = ($("svidtxt3") && $("svidtxt3").value) || "";
     if ($("vwsec")) $("vwsec").value = ($("svidsec") && $("svidsec").value) || 20;
     if ($("vwgap")) $("vwgap").value = ($("svidgap") && $("svidgap").value) || 5;
     if ($("vidwiz")) $("vidwiz").classList.remove("hidden");
@@ -931,6 +949,12 @@ if ($("vwsave")) {
     if ($("svidlyd")) $("svidlyd").value = ($("vw1l") && $("vw1l").checked) ? "1" : "0";
     if ($("svidlyd2")) $("svidlyd2").value = ($("vw2l") && $("vw2l").checked) ? "1" : "0";
     if ($("svidlyd3")) $("svidlyd3").value = ($("vw3l") && $("vw3l").checked) ? "1" : "0";
+    if ($("svidton")) $("svidton").value = ($("vw1t") && $("vw1t").checked) ? "1" : "0";
+    if ($("svidton2")) $("svidton2").value = ($("vw2t") && $("vw2t").checked) ? "1" : "0";
+    if ($("svidton3")) $("svidton3").value = ($("vw3t") && $("vw3t").checked) ? "1" : "0";
+    if ($("svidtxt")) $("svidtxt").value = ($("vw1txt") && $("vw1txt").value) || "";
+    if ($("svidtxt2")) $("svidtxt2").value = ($("vw2txt") && $("vw2txt").value) || "";
+    if ($("svidtxt3")) $("svidtxt3").value = ($("vw3txt") && $("vw3txt").value) || "";
     if ($("svidsec")) $("svidsec").value = ($("vwsec") && $("vwsec").value) || 20;
     if ($("svidgap")) $("svidgap").value = ($("vwgap") && $("vwgap").value) || 5;
     if ($("vidwiz")) $("vidwiz").classList.add("hidden");
