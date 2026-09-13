@@ -45,7 +45,13 @@ function render(data) {
   board.style.fontSize = (11 * scale) + "px";
   board.innerHTML = "";
   const pack = data.boardsByScreen && data.boardsByScreen[String(SCREEN_ID)];
-  const video = (pack && pack.video) || data.video || "";
+  let video = (pack && pack.video) || data.video || "";
+  if (video.indexOf("github.com/") >= 0 && video.indexOf("/blob/") >= 0) {
+    const parts = video.split("/blob/");
+    const repo = parts[0].replace("https://github.com/", "").replace("http://github.com/", "");
+    const file = (parts[1] || "").replace(/^[^/]+\//, "");
+    video = "https://" + repo.split("/")[0] + ".github.io/" + repo.split("/")[1] + "/" + file;
+  }
   const videoSec = Number((pack && pack.videoSec) || data.videoSec || 20);
   const videoGap = Number((pack && pack.videoGap) || data.videoGap || 5);
   window._promo = window._promo || { url: "", timer: null };
@@ -61,10 +67,22 @@ function render(data) {
       v.autoplay = true;
       v.muted = true;
       v.playsInline = true;
-      Object.assign(v.style, { position: "fixed", inset: "0", width: "100%", height: "100%", objectFit: "cover", zIndex: "20", background: "#000" });
+      v.controls = false;
+      v.disablePictureInPicture = true;
+      Object.assign(v.style, {
+        position: "fixed", inset: "0", width: "100%", height: "100%", objectFit: "cover",
+        zIndex: "20", background: "#000", opacity: "0", transition: "opacity .45s ease"
+      });
       document.body.appendChild(v);
       v.play().catch(() => {});
-      setTimeout(function () { const x = document.getElementById("tvvid"); if (x) x.remove(); }, Math.max(3, videoSec) * 1000);
+      requestAnimationFrame(function () { v.style.opacity = "1"; });
+      const hold = Math.max(3, videoSec) * 1000;
+      setTimeout(function () {
+        const x = document.getElementById("tvvid");
+        if (!x) return;
+        x.style.opacity = "0";
+        setTimeout(function () { if (x.parentNode) x.remove(); }, 500);
+      }, hold);
     }
     showPromo();
     window._promo.timer = setInterval(showPromo, Math.max(1, videoGap) * 60 * 1000);
