@@ -166,16 +166,52 @@
         </select>
       </label>
       <label class="tick"><input type="checkbox" id="sticker" /> Vis lysavis</label>
-      <label>Video-fil <input id="svidfile" type="file" accept="video/mp4,video/*" /></label>
-      <label>Video 1 <input id="svid" placeholder="https://…mp4" /></label>
-      <label>Video 2 <input id="svid2" placeholder="https://…mp4" /></label>
-      <label>Video 3 <input id="svid3" placeholder="https://…mp4" /></label>
-      <label>Varer <input id="svidsec" type="number" value="20" /> sek</label>
-      <label>Hver <input id="svidgap" type="number" value="5" /> min</label>
+      <button type="button" class="ghost" id="svidbtn">Videoer</button>
+      <input id="svid" type="hidden" />
+      <input id="svid2" type="hidden" />
+      <input id="svid3" type="hidden" />
+      <input id="svidsec" type="hidden" value="20" />
+      <input id="svidgap" type="hidden" value="5" />
+      <input id="svidlyd" type="hidden" value="0" />
+      <input id="svidlyd2" type="hidden" value="0" />
+      <input id="svidlyd3" type="hidden" value="0" />
       <button type="button" class="ghost" id="scopy">Kopiér til næste skærm</button>
       <button type="button" class="ghost" id="sview">Vis menukort</button>
     </aside>
     <div id="scols" class="col-board"></div>
+  </div>
+  <div id="vidwiz" class="xlwiz hidden">
+    <div class="xlbox" style="background:#1b1916;color:#f4efe6;max-width:720px">
+      <h3>Videoer</h3>
+      <p>Vælg fil — adressen udfyldes. Lyd: blå flueben.</p>
+      <label>Video 1 <input id="vw1" placeholder="https://…" /></label>
+      <div style="display:flex;gap:8px;align-items:center;margin:6px 0 12px">
+        <button type="button" class="ghost" id="vw1f">Vælg fil</button>
+        <button type="button" class="ghost" id="vw1v">Vis</button>
+        <label class="tick"><input type="checkbox" id="vw1l" /> Lyd</label>
+        <input type="file" id="vw1file" accept="video/mp4,video/*" hidden />
+      </div>
+      <label>Video 2 <input id="vw2" placeholder="https://…" /></label>
+      <div style="display:flex;gap:8px;align-items:center;margin:6px 0 12px">
+        <button type="button" class="ghost" id="vw2f">Vælg fil</button>
+        <button type="button" class="ghost" id="vw2v">Vis</button>
+        <label class="tick"><input type="checkbox" id="vw2l" /> Lyd</label>
+        <input type="file" id="vw2file" accept="video/mp4,video/*" hidden />
+      </div>
+      <label>Video 3 <input id="vw3" placeholder="https://…" /></label>
+      <div style="display:flex;gap:8px;align-items:center;margin:6px 0 12px">
+        <button type="button" class="ghost" id="vw3f">Vælg fil</button>
+        <button type="button" class="ghost" id="vw3v">Vis</button>
+        <label class="tick"><input type="checkbox" id="vw3l" /> Lyd</label>
+        <input type="file" id="vw3file" accept="video/mp4,video/*" hidden />
+      </div>
+      <label>Hver <input id="vwgap" type="number" value="5" style="width:64px" /> min · varer <input id="vwsec" type="number" value="20" style="width:64px" /> sek</label>
+      <video id="vwprev" controls style="width:100%;max-height:200px;margin-top:10px;display:none;background:#000"></video>
+      <div class="actions" style="margin-top:12px">
+        <button type="button" class="ghost" id="vwcancel">Annuller</button>
+        <button type="button" class="go" id="vwsave">Gem</button>
+      </div>
+    </div>
   </div>
   <div id="xlwiz" class="xlwiz hidden">
     <div class="xlbox">

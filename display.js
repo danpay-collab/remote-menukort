@@ -55,11 +55,13 @@ function render(data) {
     }
     return u;
   }
-  const videos = [
-    fixVid((pack && pack.video) || data.video || ""),
-    fixVid((pack && pack.video2) || data.video2 || ""),
-    fixVid((pack && pack.video3) || data.video3 || ""),
-  ].filter(Boolean);
+  const rawList = [
+    { u: fixVid((pack && pack.video) || data.video || ""), s: !!(pack && pack.videoSound) },
+    { u: fixVid((pack && pack.video2) || data.video2 || ""), s: !!(pack && pack.videoSound2) },
+    { u: fixVid((pack && pack.video3) || data.video3 || ""), s: !!(pack && pack.videoSound3) },
+  ].filter(function (x) { return x.u; });
+  const videos = rawList.map(function (x) { return x.u; });
+  const vidSound = rawList.map(function (x) { return x.s; });
   let video = videos[0] || "";
   const videoSec = Number((pack && pack.videoSec) || data.videoSec || 20);
   const videoGap = Number((pack && pack.videoGap) || data.videoGap || 5);
@@ -88,12 +90,14 @@ function render(data) {
       cover(true);
       v = document.createElement("video");
       v.id = "tvvid";
-      v.src = videos[window._promo.i % videos.length];
+      const ix = window._promo.i % videos.length;
+      v.src = videos[ix];
+      const loud = !!(vidSound && vidSound[ix]);
       window._promo.i += 1;
       v.autoplay = true;
-      v.muted = false;
-      v.defaultMuted = false;
-      v.volume = 1;
+      v.muted = !loud;
+      v.defaultMuted = !loud;
+      v.volume = loud ? 1 : 0;
       v.playsInline = true;
       v.controls = false;
       v.disablePictureInPicture = true;

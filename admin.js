@@ -587,6 +587,9 @@ function stashScreen() {
     video: ($("svid") && $("svid").value) || "",
     video2: ($("svid2") && $("svid2").value) || "",
     video3: ($("svid3") && $("svid3").value) || "",
+    videoSound: ($("svidlyd") && $("svidlyd").value) === "1",
+    videoSound2: ($("svidlyd2") && $("svidlyd2").value) === "1",
+    videoSound3: ($("svidlyd3") && $("svidlyd3").value) === "1",
     videoSec: Number($("svidsec") && $("svidsec").value) || 20,
     videoGap: Number($("svidgap") && $("svidgap").value) || 5,
   };
@@ -601,6 +604,9 @@ function applyScreen(n) {
   if ($("svid")) $("svid").value = b.video || "";
   if ($("svid2")) $("svid2").value = b.video2 || "";
   if ($("svid3")) $("svid3").value = b.video3 || "";
+  if ($("svidlyd")) $("svidlyd").value = b.videoSound ? "1" : "0";
+  if ($("svidlyd2")) $("svidlyd2").value = b.videoSound2 ? "1" : "0";
+  if ($("svidlyd3")) $("svidlyd3").value = b.videoSound3 ? "1" : "0";
   if ($("svidsec")) $("svidsec").value = b.videoSec || 20;
   if ($("svidgap")) $("svidgap").value = b.videoGap || 5;
   document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("on", t.getAttribute("data-scr") === activeScreen));
@@ -772,7 +778,10 @@ function applyExcelWizard() {
   const iXl = colIndex(heads, ["xl"]);
   const iXxl = colIndex(heads, ["xxl"]);
   const groups = {};
-  rows.slice(1).forEach((r) => {
+  const startAt = Number($("xlstart") && $("xlstart").value);
+  let body = rows.slice(1).filter((r) => (r || []).some((c) => String(c == null ? "" : c).trim()));
+  if (Number.isFinite(startAt) && startAt > 0) body = body.slice(startAt - 1);
+  body.forEach((r) => {
     const cells = (r || []).map((c) => (c == null ? "" : c));
     if (!cells.some((c) => String(c).trim())) return;
     const title = iCol >= 0 ? String(cells[iCol] || "MENU") : "MENU";
@@ -796,14 +805,9 @@ function applyExcelWizard() {
       nightAdd: "", lunchAdd: "",
     });
   });
-  const startAt = Number($("xlstart") && $("xlstart").value);
   const dest = $("xlcol") && $("xlcol").value;
   Object.keys(groups).forEach((title) => {
-    let items = groups[title];
-    if (Number.isFinite(startAt) && startAt > 0) {
-      const hit = items.findIndex((it) => Number(it.num) === startAt);
-      items = hit >= 0 ? items.slice(hit) : items.slice(Math.max(0, startAt - 1));
-    }
+    const items = groups[title];
     if (dest && dest !== "ny" && sections[Number(dest)]) {
       const col = sections[Number(dest)];
       col.items = (col.items || []).concat(items);
@@ -905,25 +909,62 @@ if ($("sfile")) {
 }
 if ($("sscanbtn") && $("sscan")) $("sscanbtn").addEventListener("click", () => $("sscan").click());
 if ($("sbgbtn") && $("sbg")) $("sbgbtn").addEventListener("click", () => $("sbg").click());
-if ($("svidfile")) {
-  $("svidfile").addEventListener("change", async (e) => {
-    const f = e.target.files && e.target.files[0];
-    if (!f || !currentId) return;
-    if (!firebase.storage) { alert("Video-upload kræver Firebase Storage."); return; }
-    $("stitle").textContent = "Uploader video…";
-    try {
-      const path = "videos/" + currentId + "/" + activeScreen + ".mp4";
-      const ref = firebase.storage().ref(path);
-      await ref.put(f);
-      const url = await ref.getDownloadURL();
-      if ($("svid")) $("svid").value = url;
-      $("stitle").textContent = currentId;
-      alert("Video lagt op. Send til TV.");
-    } catch (err) {
-      alert("Kunne ikke lægge video op: " + err.message);
-    }
+if ($("svidbtn")) {
+  $("svidbtn").addEventListener("click", () => {
+    if ($("vw1")) $("vw1").value = ($("svid") && $("svid").value) || "";
+    if ($("vw2")) $("vw2").value = ($("svid2") && $("svid2").value) || "";
+    if ($("vw3")) $("vw3").value = ($("svid3") && $("svid3").value) || "";
+    if ($("vw1l")) $("vw1l").checked = ($("svidlyd") && $("svidlyd").value) === "1";
+    if ($("vw2l")) $("vw2l").checked = ($("svidlyd2") && $("svidlyd2").value) === "1";
+    if ($("vw3l")) $("vw3l").checked = ($("svidlyd3") && $("svidlyd3").value) === "1";
+    if ($("vwsec")) $("vwsec").value = ($("svidsec") && $("svidsec").value) || 20;
+    if ($("vwgap")) $("vwgap").value = ($("svidgap") && $("svidgap").value) || 5;
+    if ($("vidwiz")) $("vidwiz").classList.remove("hidden");
   });
 }
+if ($("vwcancel")) $("vwcancel").addEventListener("click", () => { if ($("vidwiz")) $("vidwiz").classList.add("hidden"); });
+if ($("vwsave")) {
+  $("vwsave").addEventListener("click", () => {
+    if ($("svid")) $("svid").value = ($("vw1") && $("vw1").value) || "";
+    if ($("svid2")) $("svid2").value = ($("vw2") && $("vw2").value) || "";
+    if ($("svid3")) $("svid3").value = ($("vw3") && $("vw3").value) || "";
+    if ($("svidlyd")) $("svidlyd").value = ($("vw1l") && $("vw1l").checked) ? "1" : "0";
+    if ($("svidlyd2")) $("svidlyd2").value = ($("vw2l") && $("vw2l").checked) ? "1" : "0";
+    if ($("svidlyd3")) $("svidlyd3").value = ($("vw3l") && $("vw3l").checked) ? "1" : "0";
+    if ($("svidsec")) $("svidsec").value = ($("vwsec") && $("vwsec").value) || 20;
+    if ($("svidgap")) $("svidgap").value = ($("vwgap") && $("vwgap").value) || 5;
+    if ($("vidwiz")) $("vidwiz").classList.add("hidden");
+  });
+}
+async function uploadSlot(slot, file) {
+  if (!file || !currentId) return;
+  if (!firebase.storage) { alert("Slå Firebase Storage til."); return; }
+  const path = "videos/" + currentId + "/" + activeScreen + "-" + slot + ".mp4";
+  await firebase.storage().ref(path).put(file);
+  return firebase.storage().ref(path).getDownloadURL();
+}
+[["vw1f","vw1file","vw1"],["vw2f","vw2file","vw2"],["vw3f","vw3file","vw3"]].forEach((ids) => {
+  if ($(ids[0]) && $(ids[1])) $(ids[0]).addEventListener("click", () => $(ids[1]).click());
+  if ($(ids[1])) $(ids[1]).addEventListener("change", async (e) => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    try {
+      const url = await uploadSlot(ids[2], f);
+      if ($(ids[2])) $(ids[2]).value = url;
+    } catch (err) { alert("Upload fejlede: " + err.message); }
+  });
+});
+[["vw1v","vw1"],["vw2v","vw2"],["vw3v","vw3"]].forEach((ids) => {
+  if ($(ids[0])) $(ids[0]).addEventListener("click", () => {
+    const u = $(ids[1]) && $(ids[1]).value;
+    if (!u) return;
+    const p = $("vwprev");
+    if (!p) return;
+    p.style.display = "block";
+    p.src = u;
+    p.play().catch(() => {});
+  });
+});
 function prepScan(file) {
   return new Promise((resolve, reject) => {
     const img = new Image();
