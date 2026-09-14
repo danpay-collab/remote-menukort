@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Skærmkort</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="stylesheet" href="style.css?v=9" />
+  <link rel="stylesheet" href="style.css?v=10" />
   <style>
     .studio:not(.hidden){display:grid!important;grid-template-columns:280px 1fr;grid-template-rows:64px 1fr;background:#efe8dc}
     .studio-top{grid-column:1/-1;grid-row:1;display:flex;align-items:center;justify-content:flex-end;gap:14px;padding:0 16px;background:#1b1916;color:#f4efe6;border-bottom:1px solid #3a332b;z-index:5}
@@ -27,6 +27,18 @@
     #ssave{background:#2f7a32!important;color:#fff!important}
   #vidwiz input[type=text],#vidwiz input:not([type]),#vidwiz input[placeholder]{width:100%!important;min-width:0;box-sizing:border-box}
 #vidwiz label{display:block}
+    #panel.win{background:#fff;border:1px solid #c8c8c8;border-radius:8px;box-shadow:0 12px 40px rgba(0,0,0,.18);padding:0 16px 16px;max-width:640px}
+    #panel.win .winbar{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#666;padding:8px 0;border-bottom:1px solid #eee}
+    #panel.win .winhead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:10px 0}
+    #panel.win .winhead h2{margin:0;font-size:22px}
+    #panel.win .winhead .muted{margin:0;font-size:14px}
+    #panel.win .winhead #viewmenu{margin-left:auto}
+    #panel.win .ziprow,#panel.win .grid2{display:grid;grid-template-columns:120px 1fr;gap:10px}
+    #panel.win .grid2{grid-template-columns:1fr 1fr}
+    #panel.win .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+    #panel.win .winact{display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:14px}
+    #panel.win .danger{background:#fff;color:#c62828;border:1px solid #c62828;padding:8px 14px;border-radius:8px}
+    #panel.win input,#panel.win select{width:100%;box-sizing:border-box}
 </style>
 </head>
 <body class="admin">
@@ -84,46 +96,54 @@
     </aside>
     <div class="main">
       <div id="map"></div>
-      <section class="panel hidden" id="panel">
-        <button type="button" class="close" id="close">Luk</button>
-        <h2 id="pname"></h2>
-        <p id="pcity" class="muted"></p>
+      <section class="panel win hidden" id="panel">
+        <div class="winbar"><span>Kundekort</span><button type="button" class="close" id="close">✕</button></div>
+        <div class="winhead">
+          <h2 id="pname"></h2>
+          <p id="pcity" class="muted"></p>
+          <button type="button" class="primary" id="viewmenu">Vis menukort</button>
+        </div>
         <div id="pscreens" class="screens"></div>
-        <p class="tv-url muted" id="tvurl"></p>
         <div id="paircodes" class="paircodes"></div>
-        <button type="button" class="ghost" id="placebtn">Placer kunden på kortet</button>
-        <p class="muted" id="placehint"></p>
-        <button type="button" class="primary" id="viewmenu">Vis menukort</button>
-        <button type="button" class="ghost" id="cvrupd">Opdater fra CVR</button>
+        <p class="tv-url muted" id="tvurl" hidden></p>
+        <button type="button" class="ghost" id="placebtn" hidden>Placer kunden på kortet</button>
+        <p class="muted" id="placehint" hidden></p>
+        <button type="button" class="ghost" id="cvrupd" hidden>Opdater fra CVR</button>
+        <button type="button" class="ghost" id="copytv" hidden>Kopier menukort-link</button>
+        <button type="button" class="ghost" id="add" hidden>Åbn menukort</button>
+        <div class="grid2">
+          <label>Kontaktperson <input id="econtact" /></label>
+          <label>E-mail <input id="eemail" type="email" /></label>
+        </div>
+        <label>Telefon <input id="ephone" /></label>
         <label>Firmanavn <input id="ename" /></label>
         <label>Adresse <input id="eaddr" /></label>
-        <label>Postnr. <input id="ezip" maxlength="4" placeholder="5471" /></label>
-        <label>By <input id="ecity" /></label>
-        <label>Landsdel
-          <select id="eregion">
-            <option>Nordjylland</option>
-            <option>Midtjylland</option>
-            <option>Sønderjylland</option>
-            <option>Fyn</option>
-            <option>Sjælland</option>
-            <option>Lolland-Falster</option>
-            <option>Bornholm</option>
-          </select>
-        </label>
-        <label>Antal skærme <input id="escreens" type="number" min="1" /></label>
-        <button type="button" class="ghost" id="copytv">Kopier menukort-link</button>
-        <label>Telefon <input id="ephone" /></label>
-        <label>Overskrift på TV <input id="venue" /></label>
+        <div class="ziprow">
+          <label>Postnr. <input id="ezip" maxlength="4" placeholder="5485" /></label>
+          <label>By <input id="ecity" /></label>
+        </div>
+        <div class="grid3">
+          <label>Landsdel
+            <select id="eregion">
+              <option>Nordjylland</option>
+              <option>Midtjylland</option>
+              <option>Sønderjylland</option>
+              <option>Fyn</option>
+              <option>Sjælland</option>
+              <option>Lolland-Falster</option>
+              <option>Bornholm</option>
+            </select>
+          </label>
+          <label>Antal skærme <input id="escreens" type="number" min="1" /></label>
+          <label>Overskrift på TV <input id="venue" /></label>
+        </div>
         <label class="tick">Vis lysavis <input type="checkbox" id="etickon" /></label>
         <label>Lysavis-tekst <input id="ticker" /></label>
-        <label>Note <input id="footerNote" /></label>
-        <div class="row-between">
-          <button type="button" class="ghost" id="add">Åbn menukort</button>
-        </div>
-        <div class="actions">
-          <button type="button" class="primary" id="save">Gem og send</button>
-          <button type="button" class="ghost" id="delcust">Slet kunde</button>
+        <label>Note (kun internt) <input id="footerNote" /></label>
+        <div class="actions winact">
           <span id="msg"></span>
+          <button type="button" class="primary" id="save">Gem og send</button>
+          <button type="button" class="danger" id="delcust">Slet kunde</button>
         </div>
       </section>
     </div>

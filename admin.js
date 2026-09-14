@@ -203,6 +203,8 @@ async function openCustomer(id) {
   $("escreens").value = c.screenCount || 1;
   if ($("ews")) $("ews").value = c.wsUrl || "";
   $("ephone").value = c.phone || "";
+  if ($("econtact")) $("econtact").value = c.contact || "";
+  if ($("eemail")) $("eemail").value = c.email || "";
   $("venue").value = c.venue || "";
   $("ticker").value = c.ticker || "";
   if ($("etickon")) $("etickon").checked = !!c.showTicker;
@@ -448,7 +450,7 @@ $("seed").addEventListener("click", async () => {
 
 $("delcust").addEventListener("click", async () => {
   if (!db || !currentId) return;
-  if (!confirm("Slet kunden " + currentId + "?")) return;
+  if (!confirm("Er du sikker på, du vil slette kunden?")) return;
   await db.collection("customers").doc(currentId).delete();
   if (markers[currentId]) {
     map.removeLayer(markers[currentId]);
@@ -1133,6 +1135,8 @@ $("save").addEventListener("click", async () => {
       screenCount: Number($("escreens").value || 1),
       wsUrl: ($("ews") && $("ews").value) || "",
       phone: $("ephone").value,
+      contact: ($("econtact") && $("econtact").value) || "",
+      email: ($("eemail") && $("eemail").value) || "",
       venue: venue,
       ticker: $("ticker").value,
       showTicker: !!( $("etickon") && $("etickon").checked ),
