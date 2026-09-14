@@ -5,6 +5,21 @@ let currentId = null;
 let items = [];
 let sections = [];
 let boardsByScreen = {};
+const HOURDAYS = [
+  ["man","Mandag"],["tir","Tirsdag"],["ons","Onsdag"],["tor","Torsdag"],
+  ["fre","Fredag"],["lor","Lørdag"],["son","Søndag"]
+];
+let pendingHours = {};
+function hourSummary(h) {
+  h = h || {};
+  const bits = HOURDAYS.map(function (d) {
+    const x = h[d[0]] || {};
+    if (x.closed) return d[1].slice(0,3) + " lukket";
+    if (x.from || x.to) return d[1].slice(0,3) + " " + (x.from || "") + "-" + (x.to || "");
+    return "";
+  }).filter(Boolean);
+  return bits.join(" · ") || "Ingen tider sat";
+}
 let activeScreen = "1";
 let map, markers = {};
 let placeMode = false;
@@ -209,6 +224,8 @@ async function openCustomer(id) {
   $("ticker").value = c.ticker || "";
   if ($("etickon")) $("etickon").checked = !!c.showTicker;
   $("footerNote").value = c.footerNote || "";
+  pendingHours = c.hours || {};
+  if ($("hoursum")) $("hoursum").textContent = hourSummary(pendingHours);
   items = c.items || [];
   drawItems();
   const prev = $("preview");
@@ -237,10 +254,49 @@ async function openCustomer(id) {
       const ok = Date.now() - t < 45000;
       const row = document.createElement("div");
       row.className = "screen-row";
-      row.innerHTML = `<span><span class="dot ${ok ? "ok" : "bad"}"></span>${s.label || sid}</span><span>${ok ? "kører" : "tavs"} · ${ago(s.lastSeen)}</span>`;
+      row.className = "screen-row " + (ok ? "is-on" : "is-off");
+      row.innerHTML = `<span class="dot ${ok ? "ok" : "bad"}"></span>Skærm ${sid} ${ok ? "kører" : "tavs"}`;
       box.appendChild(row);
     });
   }
+}
+
+
+if ($("hourbtn")) {
+  $("hourbtn").addEventListener("click", function () {
+    const box = $("hourrows");
+    if (!box) return;
+    box.innerHTML = "";
+    HOURDAYS.forEach(function (d) {
+      const x = pendingHours[d[0]] || { from: "16:00", to: "22:00", closed: false };
+      const row = document.createElement("div");
+      row.style.cssText = "display:grid;grid-template-columns:90px 90px 90px auto;gap:8px;align-items:center;margin:6px 0";
+      row.innerHTML = "<span>" + d[1] + "</span>"
+        + "<input type='time' data-h='" + d[0] + "' data-k='from' value='" + (x.from || "16:00") + "' />"
+        + "<input type='time' data-h='" + d[0] + "' data-k='to' value='" + (x.to || "22:00") + "' />"
+        + "<label class='tick'><input type='checkbox' data-h='" + d[0] + "' data-k='closed'" + (x.closed ? " checked" : "") + " /> Lukket</label>";
+      box.appendChild(row);
+    });
+    if ($("hourwiz")) $("hourwiz").classList.remove("hidden");
+  });
+}
+if ($("hourcancel")) $("hourcancel").addEventListener("click", function () {
+  if ($("hourwiz")) $("hourwiz").classList.add("hidden");
+});
+if ($("hoursave")) {
+  $("hoursave").addEventListener("click", function () {
+    pendingHours = {};
+    document.querySelectorAll("#hourrows input").forEach(function (el) {
+      const d = el.getAttribute("data-h");
+      const k = el.getAttribute("data-k");
+      if (!d) return;
+      pendingHours[d] = pendingHours[d] || {};
+      if (k === "closed") pendingHours[d].closed = el.checked;
+      else pendingHours[d][k] = el.value;
+    });
+    if ($("hoursum")) $("hoursum").textContent = hourSummary(pendingHours);
+    if ($("hourwiz")) $("hourwiz").classList.add("hidden");
+  });
 }
 
 function start() {
@@ -1141,6 +1197,7 @@ $("save").addEventListener("click", async () => {
       ticker: $("ticker").value,
       showTicker: !!( $("etickon") && $("etickon").checked ),
       footerNote: $("footerNote").value,
+      hours: pendingHours || {},
       items: items || [],
     };
     if (pos) {
