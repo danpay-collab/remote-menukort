@@ -28,6 +28,13 @@
   #vidwiz input[type=text],#vidwiz input:not([type]),#vidwiz input[placeholder]{width:100%!important;min-width:0;box-sizing:border-box}
 #vidwiz label{display:block}
     #panel.win{background:#fff;border:1px solid #c8c8c8;border-radius:10px;box-shadow:0 18px 50px rgba(0,0,0,.22);padding:0 20px 18px;width:min(820px,92vw);max-width:820px}
+    
+    #panel.win .statline{display:flex;flex-direction:column;align-items:flex-start;gap:8px;margin:6px 0 12px}
+    #panel.win .statline .screens,#panel.win .statline .paircodes{display:flex;flex-wrap:wrap;gap:6px;margin:0}
+    #panel.win .screen-row{padding:4px 10px;font-size:12px;margin:0}
+    #panel.win .codepill{padding:4px 10px;font-size:12px;margin:0}
+
+    #panel.win .screens .screen-row{display:inline-flex!important;width:auto!important;flex:0 0 auto!important;white-space:nowrap}
     #panel.win .screens{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
     #panel.win .screen-row{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;background:#f4f1ea;font-size:13px;border:1px solid #e4ddd2}
     #panel.win .paircodes{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 14px}
@@ -109,8 +116,10 @@
           <p id="pcity" class="muted"></p>
           <button type="button" class="primary" id="viewmenu">Vis menukort</button>
         </div>
-        <div id="pscreens" class="screens"></div>
-        <div id="paircodes" class="paircodes"></div>
+        <div class="statline">
+          <div id="pscreens" class="screens"></div>
+          <div id="paircodes" class="paircodes"></div>
+        </div>
         <p class="tv-url muted" id="tvurl" hidden></p>
         <button type="button" class="ghost" id="placebtn" hidden>Placer kunden på kortet</button>
         <p class="muted" id="placehint" hidden></p>

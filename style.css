@@ -77,7 +77,7 @@ h2, h3 { margin: 8px 0; }
 .primary { background: #1b1713; color: #fff; border: 0; border-radius: 10px; padding: 12px 16px; font-weight: 600; cursor: pointer; }
 .ghost, .tiny { background: #fff; border: 1px solid #d7cfc3; border-radius: 8px; padding: 8px 10px; cursor: pointer; }
 .screens { display: flex; flex-direction: column; gap: 8px; margin: 10px 0; }
-.screen-row { display: flex; justify-content: space-between; padding: 8px 10px; background: #f7f3ec; border-radius: 8px; font-size: 14px; }
+.screen-row { display: inline-flex; justify-content: flex-start; gap: 6px; padding: 4px 10px; background: #f7f3ec; border-radius: 999px; font-size: 12px; width: auto; }
 .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 8px; }
 .dot.ok { background: #3dba7a; }
 .dot.bad { background: #d4452a; }
