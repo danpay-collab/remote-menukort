@@ -283,7 +283,7 @@ if (cfg && cfg.apiKey !== "INDSÆT") {
   });
   async function beat() {
     await ref.set({
-      screens: { [SCREEN_ID]: { label: "Skærm 1", lastSeen: firebase.firestore.FieldValue.serverTimestamp() } },
+      screens: { [SCREEN_ID]: { label: "Skærm " + SCREEN_ID, lastSeen: firebase.firestore.FieldValue.serverTimestamp() } },
     }, { merge: true });
   }
   beat();
