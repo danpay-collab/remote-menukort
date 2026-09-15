@@ -23,6 +23,7 @@ function hourSummary(h) {
 let activeScreen = "1";
 let map, markers = {};
 let placeMode = false;
+const KUNDEMODE = new URLSearchParams(location.search).get("mode") === "kunde";
 
 const SEED = {
   "38765432": {
@@ -311,15 +312,16 @@ function start() {
   }
   firebase.initializeApp(cfg);
   db = firebase.firestore();
-  initMap();
-  db.collection("customers").onSnapshot((snap) => {
-    paint(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
-  });
-  applyKundeMode();
-  if (KUNDE) {
+  if (KUNDEMODE) {
+    applyKundeMode();
     const kid = new URLSearchParams(location.search).get("id") || sessionStorage.getItem("kundeId");
-    if (kid && sessionStorage.getItem("kundeId") === kid) openCustomer(kid);
+    if (kid) openCustomer(kid);
     else location.href = "kunde.html";
+  } else {
+    initMap();
+    db.collection("customers").onSnapshot((snap) => {
+      paint(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+    });
   }
 }
 
@@ -1227,9 +1229,9 @@ $("save").addEventListener("click", async () => {
 start();
 
 
-const KUNDE = new URLSearchParams(location.search).get("mode") === "kunde";
+const KUNDE = (typeof KUNDEMODE !== "undefined") ? KUNDEMODE : (new URLSearchParams(location.search).get("mode") === "kunde");
 function applyKundeMode() {
-  if (!KUNDE) return;
+  if (!KUNDEMODE && !KUNDE) return;
   document.body.classList.add("kunde-mode");
   ["delcust","eallow","ekode","sendlink","footerNote"].forEach(function (id) {
     const el = $(id);
