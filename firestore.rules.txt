@@ -1,4 +1,4 @@
-Regler — i Firebase: Firestore → Rules → sæt dette ind mens du tester:
+Regler — Firebase → Firestore Database → fanen Rules → sæt ALT dette ind → Publish:
 
 rules_version = '2';
 service cloud.firestore {
@@ -9,7 +9,13 @@ service cloud.firestore {
     match /pairs/{id} {
       allow read, write: if true;
     }
+    match /settings/{id} {
+      allow read, write: if true;
+    }
+    match /admins/{id} {
+      allow read, write: if true;
+    }
   }
 }
 
-Vigtigt: det er åbent. Kun til test. Skift senere til login.
+Åbent under test. Skift senere til login.

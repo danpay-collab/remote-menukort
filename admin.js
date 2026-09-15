@@ -304,38 +304,86 @@ if ($("hoursave")) {
 }
 
 
+
+let currentAdminName = sessionStorage.getItem("adminName") || "";
+function adminSlug(n) {
+  return String(n || "").trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "admin";
+}
+function paintAdminBar() {
+  if (!db || !$("adminwho")) return;
+  db.collection("admins").onSnapshot(function (snap) {
+    const box = $("adminwho");
+    box.innerHTML = "";
+    snap.docs.forEach(function (d) {
+      const a = d.data();
+      const raw = a.lastSeen;
+      const ts = raw && raw.toMillis ? raw.toMillis() : (raw ? new Date(raw).getTime() : 0);
+      const on = Date.now() - ts < 45000;
+      const b = document.createElement("span");
+      b.className = "ab-chip " + (on ? "on" : "off");
+      b.textContent = a.name || d.id;
+      box.appendChild(b);
+    });
+  });
+}
+function beatAdmin() {
+  if (!db || !currentAdminName) return;
+  db.collection("admins").doc(adminSlug(currentAdminName)).set({
+    name: currentAdminName,
+    lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+  }, { merge: true });
+}
 function gateAdmin() {
   const fallback = String(window.adminPin || "4821");
-  function showLogin(pin) {
-    if (document.getElementById("admingate")) return;
-    const box = document.createElement("div");
-    box.id = "admingate";
-    box.style.cssText = "position:fixed;inset:0;background:#eceae6;z-index:9999;display:flex;align-items:center;justify-content:center;font-family:sans-serif";
-    box.innerHTML = "<div style='background:#fff;padding:28px;border-radius:12px;width:min(380px,92vw);box-shadow:0 12px 40px rgba(0,0,0,.12)'><p style='margin:0;color:#666'>MenuLive</p><h2 style='margin:6px 0 16px'>Admin</h2><label style='display:block;font-size:14px'>Bruger</label><input id='auser' value='admin' style='width:100%;padding:10px;margin:4px 0 12px;box-sizing:border-box' /><label style='display:block;font-size:14px'>Kode</label><input id='apin' type='password' style='width:100%;padding:10px;margin:4px 0 12px;box-sizing:border-box' /><label style='font-size:14px'><input type='checkbox' id='ahusk' /> Husk mig på denne computer</label><p><button id='apgo' style='margin-top:12px;width:100%;padding:12px;background:#1b1916;color:#fff;border:0;border-radius:8px;font-weight:700'>Log ind</button></p></div>";
-    document.body.appendChild(box);
-    document.getElementById("apgo").onclick = function () {
-      const u = (document.getElementById("auser").value || "").trim().toLowerCase();
-      const k = document.getElementById("apin").value || "";
-      if (u !== "admin" || (k !== pin && k !== fallback)) { alert("Forkert bruger eller kode."); return; }
-      sessionStorage.setItem("adminOk", "1");
-      if (document.getElementById("ahusk").checked) localStorage.setItem("adminOk", "1");
-      location.reload();
-    };
-  }
-  showLogin(fallback);
-  if (!db) return;
-  db.collection("settings").doc("app").get().then(function (snap) {
-    const pin = (snap.exists && snap.data().adminPin) ? snap.data().adminPin : fallback;
-    const btn = document.getElementById("apgo");
-    if (btn) btn.onclick = function () {
-      const u = (document.getElementById("auser").value || "").trim().toLowerCase();
-      const k = document.getElementById("apin").value || "";
-      if (u !== "admin" || (k !== pin && k !== fallback)) { alert("Forkert bruger eller kode."); return; }
-      sessionStorage.setItem("adminOk", "1");
-      if (document.getElementById("ahusk").checked) localStorage.setItem("adminOk", "1");
-      location.reload();
-    };
-  }).catch(function () {});
+  if (document.getElementById("admingate")) return;
+  const box = document.createElement("div");
+  box.id = "admingate";
+  box.style.cssText = "position:fixed;inset:0;background:#eceae6;z-index:9999;display:flex;align-items:center;justify-content:center;font-family:sans-serif";
+  box.innerHTML = "<div style='background:#fff;padding:28px;border-radius:12px;width:min(380px,92vw);box-shadow:0 12px 40px rgba(0,0,0,.12)'>"
+    + "<p style='margin:0;color:#666'>MenuLive</p><h2 style='margin:6px 0 16px'>Admin</h2>"
+    + "<label style='display:block;font-size:14px'>Navn</label><input id='auser' style='width:100%;padding:10px;margin:4px 0 12px;box-sizing:border-box' />"
+    + "<label style='display:block;font-size:14px'>Kode</label><input id='apin' type='password' style='width:100%;padding:10px;margin:4px 0 12px;box-sizing:border-box' />"
+    + "<p class='muted' style='font-size:13px'>Forste gang: 4821. Vaelg derefter din egen kode.</p>"
+    + "<label style='font-size:14px'><input type='checkbox' id='ahusk' /> Husk mig paa denne computer</label>"
+    + "<p><button id='apgo' style='margin-top:12px;width:100%;padding:12px;background:#1b1916;color:#fff;border:0;border-radius:8px;font-weight:700'>Log ind</button></p></div>";
+  document.body.appendChild(box);
+  document.getElementById("apgo").onclick = async function () {
+    const name = (document.getElementById("auser").value || "").trim();
+    const k = document.getElementById("apin").value || "";
+    if (!name) { alert("Skriv dit navn."); return; }
+    const id = adminSlug(name);
+    let pinChosen = false;
+    let stored = "";
+    try {
+      const snap = await db.collection("admins").doc(id).get();
+      if (snap.exists) {
+        stored = snap.data().kode || "";
+        pinChosen = !!snap.data().pinChosen;
+      }
+    } catch (e) {}
+    if (!pinChosen) {
+      if (k !== fallback && k !== stored) { alert("Forste gang er koden 4821."); return; }
+      const ny = prompt("Vaelg din egen admin-kode (mindst 4 tegn):") || "";
+      if (ny.length < 4) { alert("For kort."); return; }
+      await db.collection("admins").doc(id).set({
+        name: name,
+        kode: ny,
+        pinChosen: true,
+        lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+    } else if (k !== stored) {
+      alert("Forkert kode.");
+      return;
+    }
+    currentAdminName = name;
+    sessionStorage.setItem("adminOk", "1");
+    sessionStorage.setItem("adminName", name);
+    if (document.getElementById("ahusk").checked) {
+      localStorage.setItem("adminOk", "1");
+      localStorage.setItem("adminName", name);
+    }
+    location.reload();
+  };
 }
 
 function start() {
@@ -364,6 +412,10 @@ function start() {
     } else location.href = "kunde.html";
   } else {
     initMap();
+    currentAdminName = sessionStorage.getItem("adminName") || localStorage.getItem("adminName") || currentAdminName;
+    paintAdminBar();
+    beatAdmin();
+    setInterval(beatAdmin, 20000);
     db.collection("customers").onSnapshot((snap) => {
       paint(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
     });
@@ -1350,9 +1402,38 @@ if ($("adminpinsave")) {
     const a = ($("adminpin1") && $("adminpin1").value) || "";
     const b = ($("adminpin2") && $("adminpin2").value) || "";
     if (a.length < 4 || a !== b) { alert("Koden skal være ens og mindst 4 tegn."); return; }
-    await db.collection("settings").doc("app").set({ adminPin: a }, { merge: true });
-    alert("Ny admin-kode er gemt. Brug den næste gang.");
+    try {
+      await db.collection("settings").doc("app").set({ adminPin: a }, { merge: true });
+      alert("Ny admin-kode er gemt. Brug den næste gang.");
+    } catch (err) {
+      alert("Kunne ikke gemme koden: " + err.message + "\nSæt settings/{id} i Firestore Rules.");
+    }
     $("adminpin1").value = "";
     $("adminpin2").value = "";
   });
 }
+
+if ($("admininvbtn")) $("admininvbtn").addEventListener("click", function () {
+  if ($("invbox")) $("invbox").classList.toggle("hidden");
+});
+if ($("invsend")) $("invsend").addEventListener("click", async function () {
+  const name = ($("invname") && $("invname").value || "").trim();
+  const mail = ($("invmail") && $("invmail").value || "").trim();
+  if (!name || !mail) { alert("Navn og e-mail."); return; }
+  await db.collection("admins").doc(adminSlug(name)).set({
+    name: name,
+    email: mail,
+    pinChosen: false,
+    kode: ""
+  }, { merge: true });
+  const url = "https://danpay-collab.github.io/remote-menukort/admin.html";
+  const body = "MenuLive admin\n" + url + "\nNavn: " + name + "\nForste kode: 4821\nVaelg selv kode ved forste login.";
+  try {
+    await fetch("https://formsubmit.co/ajax/" + encodeURIComponent(mail), {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({ _subject: "MenuLive admin", message: body })
+    });
+  } catch (e) {}
+  alert("Invitation sendt (eller kopier selv):\n" + body);
+});
