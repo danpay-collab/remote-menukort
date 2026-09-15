@@ -274,7 +274,7 @@ if ($("hourbtn")) {
       row.innerHTML = "<span>" + d[1] + "</span>"
         + "<input type='time' data-h='" + d[0] + "' data-k='from' value='" + (x.from || "16:00") + "' />"
         + "<input type='time' data-h='" + d[0] + "' data-k='to' value='" + (x.to || "22:00") + "' />"
-        + "<label class='tick'><input type='checkbox' data-h='" + d[0] + "' data-k='closed'" + (x.closed ? " checked" : "") + " /> Lukket</label>";
+        + "<label class='tick'><input type='checkbox' data-h='" + d[0] + "' data-k='closed'" + (x.closed ? " checked" : "") + " /></label>";
       box.appendChild(row);
     });
     if ($("hourwiz")) $("hourwiz").classList.remove("hidden");

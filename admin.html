@@ -54,10 +54,12 @@
     #panel.win input,#panel.win select{width:100%;box-sizing:border-box}
 
     #hourwiz .xlbox{max-width:640px!important;width:min(640px,94vw)!important;padding:20px;overflow:hidden}
-    #hourwiz #hourrows > div{grid-template-columns:100px 1fr 1fr 90px!important;gap:10px!important;width:100%}
+    #hourwiz #hourrows > div{grid-template-columns:100px 1fr 1fr 72px!important;gap:10px!important;width:100%}
     #hourwiz input[type=time]{font-size:18px!important;padding:10px 8px!important;min-height:44px;width:100%!important;box-sizing:border-box}
     #hourwiz label.tick{font-size:15px}
 
+#hourwiz .tick{display:flex;justify-content:center;margin:0}
+#hourwiz .hourhead span:last-child{text-align:center}
 </style>
 </head>
 <body class="admin">
@@ -273,7 +275,7 @@
   <div id="hourwiz" class="xlwiz hidden">
     <div class="xlbox" style="background:#fff;max-width:480px">
       <h3>Åbningstider</h3>
-      <p class="muted">Mandag først. Kryds Lukket hvis de har fri.</p>
+      <p class="muted hourhead" style="display:grid;grid-template-columns:100px 1fr 1fr 72px;gap:10px;margin:8px 0 0;font-size:13px;color:#666"><span></span><span></span><span></span><span style="text-align:center;display:block">Lukket</span></p>
       <div id="hourrows"></div>
       <div class="actions" style="margin-top:12px">
         <button type="button" class="ghost" id="hourcancel">Annuller</button>
