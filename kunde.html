@@ -3,52 +3,124 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Kunde-login — Skærmkort</title>
-  <link rel="stylesheet" href="style.css?v=12" />
+  <title>Min butik</title>
   <style>
-    body{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#eceae6;font-family:sans-serif}
-    .card{background:#fff;border:1px solid #d0d0d0;border-radius:12px;padding:28px;width:min(420px,92vw);box-shadow:0 12px 40px rgba(0,0,0,.12)}
-    h1{margin:0 0 6px;font-size:22px}
-    label{display:block;margin:12px 0 4px;font-size:14px}
-    input{width:100%;box-sizing:border-box;padding:10px;font-size:16px}
-    button{margin-top:16px;width:100%;padding:12px;border:0;border-radius:8px;background:#1b1916;color:#fff;font-weight:700}
-    .muted{color:#666;font-size:13px}
-    .err{color:#b00020;min-height:1.2em}
+    body{margin:0;background:#eceae6;font-family:Segoe UI,sans-serif;color:#1b1916}
+    .wrap{max-width:720px;margin:24px auto;background:#fff;border:1px solid #d0d0d0;border-radius:12px;padding:24px}
+    h1{margin:0 8px 0 0;display:inline}
+    .muted{color:#666;font-size:14px}
+    label{display:block;margin:10px 0 4px;font-size:14px}
+    input{width:100%;box-sizing:border-box;padding:10px;font-size:16px;border:1px solid #ccc;border-radius:8px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .zip{grid-template-columns:120px 1fr}
+    button{margin-top:12px;padding:10px 16px;border:0;border-radius:8px;font-weight:700}
+    .go{background:#1b1916;color:#fff}
+    .ghost{background:#fff;border:1px solid #ccc}
+    .err{color:#b00020}
+    .hidden{display:none!important}
   </style>
 </head>
 <body>
-  <div class="card" id="box">
-    <p class="muted">Skærmkort</p>
+  <div class="wrap" id="login">
+    <p class="muted">Skaermkort</p>
     <h1>Kunde-login</h1>
     <label>CVR-nummer <input id="cvr" inputmode="numeric" /></label>
     <label>Adgangskode <input id="kode" type="password" /></label>
     <p class="err" id="err"></p>
-    <button type="button" id="go">Log ind</button>
-    <p class="muted">Du ser kun din egen butik.</p>
+    <button class="go" type="button" id="go">Log ind</button>
+  </div>
+  <div class="wrap hidden" id="card">
+    <h1 id="pname">Butik</h1>
+    <span class="muted" id="pcvr"></span>
+    <div class="row">
+      <label>Kontaktperson <input id="econtact" /></label>
+      <label>E-mail <input id="eemail" type="email" /></label>
+    </div>
+    <label>Telefon <input id="ephone" /></label>
+    <label>Firmanavn <input id="ename" /></label>
+    <label>Adresse <input id="eaddr" /></label>
+    <div class="row zip">
+      <label>Postnr. <input id="ezip" maxlength="4" /></label>
+      <label>By <input id="ecity" /></label>
+    </div>
+    <label>Overskrift paa TV <input id="venue" /></label>
+    <label>Lysavis-tekst <input id="ticker" /></label>
+    <p id="msg" class="muted"></p>
+    <button class="go" type="button" id="save">Gem</button>
+  </div>
+  <div class="wrap hidden" id="first">
+    <h1>Forste login</h1>
+    <p>Behold koden, eller vaelg selv en ny.</p>
+    <button class="ghost" type="button" id="keep">Behold denne kode</button>
+    <label>Ny kode <input id="n1" type="password" /></label>
+    <label>Gentag <input id="n2" type="password" /></label>
+    <button class="go" type="button" id="setpin">Gem min kode</button>
   </div>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="firebase-config.js"></script>
   <script>
-    const params = new URLSearchParams(location.search);
-    const $ = (id) => document.getElementById(id);
+    var params = new URLSearchParams(location.search);
+    function $(id){ return document.getElementById(id); }
     $("cvr").value = params.get("id") || "";
     firebase.initializeApp(window.firebaseConfig);
-    const db = firebase.firestore();
-    $("go").onclick = async () => {
-      const id = ($("cvr").value || "").trim();
-      const kode = ($("kode").value || "").trim();
+    var db = firebase.firestore();
+    var currentId = "";
+    function show(id){
+      ["login","card","first"].forEach(function(x){ $(x).classList.toggle("hidden", x !== id); });
+    }
+    function fill(c){
+      $("pname").textContent = c.name || currentId;
+      $("pcvr").textContent = "CVR " + currentId + " (laast)";
+      $("econtact").value = c.contact || "";
+      $("eemail").value = c.email || "";
+      $("ephone").value = c.phone || "";
+      $("ename").value = c.name || "";
+      $("eaddr").value = c.address || "";
+      $("ezip").value = c.zip || "";
+      $("ecity").value = c.city || "";
+      $("venue").value = c.venue || "";
+      $("ticker").value = c.ticker || "";
+    }
+    $("go").onclick = async function(){
+      var id = ($("cvr").value || "").trim();
+      var kode = ($("kode").value || "").trim();
       $("err").textContent = "";
-      if (!id || !kode) { $("err").textContent = "Udfyld begge felter."; return; }
-      const snap = await db.collection("customers").doc(id).get();
-      if (!snap.exists) { $("err").textContent = "Ukendt CVR."; return; }
-      const c = snap.data();
-      if (!c.allowLogin) { $("err").textContent = "Login er ikke slået til."; return; }
-      const ok = kode === String(c.kundeKode || "");
-      if (!ok) { $("err").textContent = "Forkert kode."; return; }
-      sessionStorage.setItem("kundeId", id);
-      sessionStorage.setItem("kundeNeedPin", c.kundePinChosen ? "0" : "1");
-      location.href = "admin.html?mode=kunde&id=" + encodeURIComponent(id);
+      if(!id || !kode){ $("err").textContent = "Udfyld begge felter."; return; }
+      var snap = await db.collection("customers").doc(id).get();
+      if(!snap.exists){ $("err").textContent = "Ukendt CVR."; return; }
+      var c = snap.data();
+      if(!c.allowLogin){ $("err").textContent = "Login er ikke slaaet til."; return; }
+      if(kode !== String(c.kundeKode || "")){ $("err").textContent = "Forkert kode."; return; }
+      currentId = id;
+      fill(c);
+      if(!c.kundePinChosen) show("first");
+      else show("card");
+    };
+    $("keep").onclick = async function(){
+      await db.collection("customers").doc(currentId).set({ kundePinChosen: true }, { merge: true });
+      show("card");
+    };
+    $("setpin").onclick = async function(){
+      var a = $("n1").value || "";
+      var b = $("n2").value || "";
+      if(a.length < 4 || a !== b){ alert("Koden skal vaere ens og mindst 4 tegn."); return; }
+      await db.collection("customers").doc(currentId).set({ kundeKode: a, kundePinChosen: true }, { merge: true });
+      show("card");
+    };
+    $("save").onclick = async function(){
+      await db.collection("customers").doc(currentId).set({
+        contact: $("econtact").value,
+        email: $("eemail").value,
+        phone: $("ephone").value,
+        name: $("ename").value,
+        address: $("eaddr").value,
+        zip: $("ezip").value,
+        city: $("ecity").value,
+        venue: $("venue").value,
+        ticker: $("ticker").value
+      }, { merge: true });
+      $("msg").textContent = "Gemt.";
     };
   </script>
 </body>
