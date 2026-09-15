@@ -552,13 +552,15 @@ $("createbtn").addEventListener("click", async () => {
   }
 });
 
-if ($("seed")) $("seed").addEventListener("click", async () => {
-  if (!db) { alert("Sæt Firebase-nøgler først."); return; }
-  for (const [id, data] of Object.entries(SEED)) {
-    await db.collection("customers").doc(id).set({ ...data, screens: {} }, { merge: true });
-  }
-  alert("Testkunder med CVR ligger i databasen.");
-});
+if ($("seed")) {
+  $("seed").addEventListener("click", async () => {
+    if (!db) { alert("Sæt Firebase-nøgler først."); return; }
+    for (const [id, data] of Object.entries(SEED)) {
+      await db.collection("customers").doc(id).set({ ...data, screens: {} }, { merge: true });
+    }
+    alert("Testkunder med CVR ligger i databasen.");
+  });
+}
 
 $("delcust").addEventListener("click", async () => {
   if (!db || !currentId) return;
@@ -1342,3 +1344,15 @@ if ($("pinset")) $("pinset").addEventListener("click", async function () {
   sessionStorage.setItem("kundeNeedPin", "0");
   if ($("pindlg")) $("pindlg").classList.add("hidden");
 });
+
+if ($("adminpinsave")) {
+  $("adminpinsave").addEventListener("click", async function () {
+    const a = ($("adminpin1") && $("adminpin1").value) || "";
+    const b = ($("adminpin2") && $("adminpin2").value) || "";
+    if (a.length < 4 || a !== b) { alert("Koden skal være ens og mindst 4 tegn."); return; }
+    await db.collection("settings").doc("app").set({ adminPin: a }, { merge: true });
+    alert("Ny admin-kode er gemt. Brug den næste gang.");
+    $("adminpin1").value = "";
+    $("adminpin2").value = "";
+  });
+}

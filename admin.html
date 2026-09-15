@@ -82,6 +82,12 @@ body.kunde-mode .side,body.kunde-mode #map,body.kunde-mode #delcust,body.kunde-m
       <p class="lead">Kunder efter CVR. Listen er delt i landsdele.</p>
       <p id="cfgwarn" class="warn hidden">Indsæt Firebase-nøgler i firebase-config.js</p>
       <button type="button" class="ghost light" id="newbtn">+ Ny kunde</button>
+      <div style="margin-top:16px;padding-top:12px;border-top:1px solid #ddd">
+        <p class="muted">Skift admin-kode</p>
+        <label>Ny kode <input id="adminpin1" type="password" /></label>
+        <label>Gentag <input id="adminpin2" type="password" /></label>
+        <button type="button" class="ghost" id="adminpinsave">Gem admin-kode</button>
+      </div>
       
       <div id="createwrap" class="xlwiz hidden">
       <section class="xlbox create-box" id="create">
