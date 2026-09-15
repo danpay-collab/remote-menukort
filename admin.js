@@ -224,8 +224,11 @@ async function openCustomer(id) {
   $("ticker").value = c.ticker || "";
   if ($("etickon")) $("etickon").checked = !!c.showTicker;
   $("footerNote").value = c.footerNote || "";
+  if ($("eallow")) $("eallow").checked = !!c.allowLogin;
+  if ($("ekode")) $("ekode").value = c.kundeKode || "";
   pendingHours = c.hours || {};
   if ($("hoursum")) $("hoursum").textContent = hourSummary(pendingHours);
+  if (typeof KUNDE !== "undefined" && KUNDE && !c.kundePinChosen && $("pindlg")) $("pindlg").classList.remove("hidden");
   items = c.items || [];
   drawItems();
   const prev = $("preview");
@@ -312,6 +315,12 @@ function start() {
   db.collection("customers").onSnapshot((snap) => {
     paint(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
   });
+  applyKundeMode();
+  if (KUNDE) {
+    const kid = new URLSearchParams(location.search).get("id") || sessionStorage.getItem("kundeId");
+    if (kid && sessionStorage.getItem("kundeId") === kid) openCustomer(kid);
+    else location.href = "kunde.html";
+  }
 }
 
 $("placebtn").addEventListener("click", () => {
@@ -1198,6 +1207,8 @@ $("save").addEventListener("click", async () => {
       showTicker: !!( $("etickon") && $("etickon").checked ),
       footerNote: $("footerNote").value,
       hours: pendingHours || {},
+      allowLogin: !!( $("eallow") && $("eallow").checked ),
+      kundeKode: ($("ekode") && $("ekode").value) || "",
       items: items || [],
     };
     if (pos) {
@@ -1214,3 +1225,58 @@ $("save").addEventListener("click", async () => {
 });
 
 start();
+
+
+const KUNDE = new URLSearchParams(location.search).get("mode") === "kunde";
+function applyKundeMode() {
+  if (!KUNDE) return;
+  document.body.classList.add("kunde-mode");
+  ["delcust","eallow","ekode","sendlink","footerNote"].forEach(function (id) {
+    const el = $(id);
+    if (!el) return;
+    const wrap = el.closest("label") || el.closest("div") || el;
+    wrap.style.display = "none";
+  });
+  const side = document.querySelector(".side");
+  const map = $("map");
+  if (side) side.style.display = "none";
+  if (map) map.style.display = "none";
+  if ($("pcity")) $("pcity").textContent = ($("pcity").textContent || "") + " (låst)";
+}
+if ($("sendlink")) {
+  $("sendlink").addEventListener("click", async function () {
+    if (!currentId) return;
+    let kode = ($("ekode") && $("ekode").value) || "";
+    if (!kode) {
+      kode = makePairCode();
+      if ($("ekode")) $("ekode").value = kode;
+    }
+    if ($("eallow")) $("eallow").checked = true;
+    await db.collection("customers").doc(currentId).set({
+      allowLogin: true,
+      kundeKode: kode,
+      kundePinChosen: false
+    }, { merge: true });
+    const mail = ($("eemail") && $("eemail").value) || "";
+    const url = location.origin + location.pathname.replace(/admin.html.*/, "kunde.html") + "?id=" + currentId;
+    const body = "Log ind her: " + url + "\nCVR: " + currentId + "\nKode: " + kode;
+    try { await navigator.clipboard.writeText(url + "\n" + body); } catch (e) {}
+    if (mail) location.href = "mailto:" + encodeURIComponent(mail) + "?subject=" + encodeURIComponent("Skærmkort login") + "&body=" + encodeURIComponent(body);
+    else alert("Link kopieret.\n" + body);
+  });
+}
+
+if ($("pinkeep")) $("pinkeep").addEventListener("click", async function () {
+  if (!currentId || !db) return;
+  await db.collection("customers").doc(currentId).set({ kundePinChosen: true }, { merge: true });
+  sessionStorage.setItem("kundeNeedPin", "0");
+  if ($("pindlg")) $("pindlg").classList.add("hidden");
+});
+if ($("pinset")) $("pinset").addEventListener("click", async function () {
+  const a = ($("pinnew") && $("pinnew").value) || "";
+  const b = ($("pinrep") && $("pinrep").value) || "";
+  if (a.length < 4 || a !== b) { alert("Koden skal være ens og mindst 4 tegn."); return; }
+  await db.collection("customers").doc(currentId).set({ kundeKode: a, kundePinChosen: true }, { merge: true });
+  sessionStorage.setItem("kundeNeedPin", "0");
+  if ($("pindlg")) $("pindlg").classList.add("hidden");
+});

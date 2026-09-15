@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kunde-login — Skærmkort</title>
+  <link rel="stylesheet" href="style.css?v=12" />
+  <style>
+    body{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#eceae6;font-family:sans-serif}
+    .card{background:#fff;border:1px solid #d0d0d0;border-radius:12px;padding:28px;width:min(420px,92vw);box-shadow:0 12px 40px rgba(0,0,0,.12)}
+    h1{margin:0 0 6px;font-size:22px}
+    label{display:block;margin:12px 0 4px;font-size:14px}
+    input{width:100%;box-sizing:border-box;padding:10px;font-size:16px}
+    button{margin-top:16px;width:100%;padding:12px;border:0;border-radius:8px;background:#1b1916;color:#fff;font-weight:700}
+    .muted{color:#666;font-size:13px}
+    .err{color:#b00020;min-height:1.2em}
+  </style>
+</head>
+<body>
+  <div class="card" id="box">
+    <p class="muted">Skærmkort</p>
+    <h1>Kunde-login</h1>
+    <label>CVR-nummer <input id="cvr" inputmode="numeric" /></label>
+    <label>Adgangskode <input id="kode" type="password" /></label>
+    <p class="err" id="err"></p>
+    <button type="button" id="go">Log ind</button>
+    <p class="muted">Du ser kun din egen butik.</p>
+  </div>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const $ = (id) => document.getElementById(id);
+    $("cvr").value = params.get("id") || "";
+    firebase.initializeApp(window.firebaseConfig);
+    const db = firebase.firestore();
+    $("go").onclick = async () => {
+      const id = ($("cvr").value || "").trim();
+      const kode = ($("kode").value || "").trim();
+      $("err").textContent = "";
+      if (!id || !kode) { $("err").textContent = "Udfyld begge felter."; return; }
+      const snap = await db.collection("customers").doc(id).get();
+      if (!snap.exists) { $("err").textContent = "Ukendt CVR."; return; }
+      const c = snap.data();
+      if (!c.allowLogin) { $("err").textContent = "Login er ikke slået til."; return; }
+      const ok = kode === String(c.kundeKode || "");
+      if (!ok) { $("err").textContent = "Forkert kode."; return; }
+      sessionStorage.setItem("kundeId", id);
+      sessionStorage.setItem("kundeNeedPin", c.kundePinChosen ? "0" : "1");
+      location.href = "admin.html?mode=kunde&id=" + encodeURIComponent(id);
+    };
+  </script>
+</body>
+</html>
