@@ -322,6 +322,17 @@ function paintAdminBar() {
       const b = document.createElement("span");
       b.className = "ab-chip " + (on ? "on" : "off");
       b.textContent = a.name || d.id;
+      if ((a.name || d.id) === currentAdminName) {
+        b.style.cursor = "pointer";
+        b.title = "Skift kode";
+        b.onclick = async function () {
+          if (!confirm("Vil du ændre din kode?")) return;
+          const ny = prompt("Ny kode (mindst 4 tegn):") || "";
+          if (ny.length < 4) { alert("For kort."); return; }
+          await db.collection("admins").doc(adminSlug(currentAdminName)).set({ kode: ny, pinChosen: true }, { merge: true });
+          alert("Koden er ændret.");
+        };
+      }
       box.appendChild(b);
     });
   });
