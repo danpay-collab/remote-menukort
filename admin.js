@@ -1436,4 +1436,7 @@ if ($("invsend")) $("invsend").addEventListener("click", async function () {
     });
   } catch (e) {}
   alert("Invitation sendt (eller kopier selv):\n" + body);
+  if ($("invbox")) $("invbox").classList.add("hidden");
+  if ($("invname")) $("invname").value = "";
+  if ($("invmail")) $("invmail").value = "";
 });
