@@ -323,13 +323,15 @@ function gateAdmin() {
       };
       return;
     }
-    box.innerHTML = "<div style='background:#fff;padding:24px;border-radius:12px;width:min(360px,92vw)'><h2>Ingen adgang</h2><p>Kun administrator.</p><input id='apin' type='password' style='width:100%;padding:10px' placeholder='Admin-kode' /><p><button id='apgo'>Fortsæt</button></p><p><a href='kunde.html'>Til kunde-login</a></p></div>";
+    box.innerHTML = "<div style='background:#fff;padding:28px;border-radius:12px;width:min(380px,92vw);box-shadow:0 12px 40px rgba(0,0,0,.12)'><p style='margin:0;color:#666'>MenuLive</p><h2 style='margin:6px 0 16px'>Admin</h2><label style='display:block;font-size:14px'>Bruger</label><input id='auser' value='admin' style='width:100%;padding:10px;margin:4px 0 12px;box-sizing:border-box' /><label style='display:block;font-size:14px'>Kode</label><input id='apin' type='password' style='width:100%;padding:10px;margin:4px 0 12px;box-sizing:border-box' /><label style='font-size:14px'><input type='checkbox' id='ahusk' /> Husk mig på denne computer</label><p><button id='apgo' style='margin-top:12px;width:100%;padding:12px;background:#1b1916;color:#fff;border:0;border-radius:8px;font-weight:700'>Log ind</button></p><p style='font-size:13px'><a href='kunde.html'>Til kunde-login</a></p></div>";
     document.body.appendChild(box);
     document.getElementById("apgo").onclick = function () {
-      if (document.getElementById("apin").value === pin) {
-        sessionStorage.setItem("adminOk", "1");
-        location.reload();
-      } else alert("Forkert kode.");
+      const u = (document.getElementById("auser").value || "").trim().toLowerCase();
+      const k = document.getElementById("apin").value || "";
+      if (u !== "admin" || k !== pin) { alert("Forkert bruger eller kode."); return; }
+      sessionStorage.setItem("adminOk", "1");
+      if (document.getElementById("ahusk").checked) localStorage.setItem("adminOk", "1");
+      location.reload();
     };
   });
 }
@@ -345,6 +347,7 @@ function start() {
   db = firebase.firestore();
   const kid0 = new URLSearchParams(location.search).get("id") || "";
   const isKunde = new URLSearchParams(location.search).get("mode") === "kunde" && sessionStorage.getItem("kundeId") === kid0 && kid0;
+  if (localStorage.getItem("adminOk") === "1") sessionStorage.setItem("adminOk", "1");
   if (!isKunde && sessionStorage.getItem("adminOk") !== "1") {
     gateAdmin();
     return;
