@@ -1244,48 +1244,32 @@ function applyKundeMode() {
   if ($("pcity")) $("pcity").textContent = ($("pcity").textContent || "") + " (låst)";
 }
 if ($("sendlink")) {
-  $("sendlink").addEventListener("click", async function () {
-    if (!currentId) { alert("Åbn kunden først."); return; }
-    let kode = ($("ekode") && $("ekode").value) || "";
+  $("sendlink").addEventListener("click", function () {
+    if (!currentId) { alert("Abn kunden forst."); return; }
+    var kode = ($("ekode") && $("ekode").value) || "";
     if (!kode) {
       kode = makePairCode();
       if ($("ekode")) $("ekode").value = kode;
     }
     if ($("eallow")) $("eallow").checked = true;
-    try {
-      await db.collection("customers").doc(currentId).set({
+    var mail = ($("eemail") && $("eemail").value) || "";
+    var url = "https://danpay-collab.github.io/remote-menukort/kunde.html?id=" + currentId;
+    var body = "Log ind her: " + url + "\nCVR: " + currentId + "\nKode: " + kode;
+    alert(body);
+    try { navigator.clipboard.writeText(body); } catch (e) {}
+    if (db) {
+      db.collection("customers").doc(currentId).set({
         allowLogin: true,
         kundeKode: kode,
         kundePinChosen: false
-      }, { merge: true });
-    } catch (err) {
-      alert("Kunne ikke gemme koden: " + err.message);
-      return;
+      }, { merge: true }).catch(function (err) { alert("Gem fejlede: " + err.message); });
     }
-    const mail = ($("eemail") && $("eemail").value) || "";
-    const url = "https://danpay-collab.github.io/remote-menukort/kunde.html?id=" + currentId;
-    const body = "Log ind her: " + url + "\nCVR: " + currentId + "\nKode: " + kode;
-    try { await navigator.clipboard.writeText(body); } catch (e) {}
-    if (!mail) {
-      alert("Ingen e-mail på kortet. Link:\n" + body);
-      return;
-    }
-    try {
-      const res = await fetch("https://formsubmit.co/ajax/" + encodeURIComponent(mail), {
+    if (mail) {
+      fetch("https://formsubmit.co/ajax/" + encodeURIComponent(mail), {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({
-          _subject: "Skærmkort login",
-          message: body,
-          cvr: currentId,
-          link: url
-        })
-      });
-      const j = await res.json().catch(function () { return {}; });
-      if (!res.ok) throw new Error(j.message || String(res.status));
-      alert("Mail sendt til " + mail + ".\nFørste gang skal kunden godkende en mail fra FormSubmit.\n\n" + body);
-    } catch (err) {
-      alert("Mail-tjenesten svarede ikke (" + err.message + "). Send selv:\n" + body);
+        body: JSON.stringify({ _subject: "Skaermkort login", message: body, cvr: currentId, link: url })
+      }).catch(function () {});
     }
   });
 }
