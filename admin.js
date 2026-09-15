@@ -550,7 +550,7 @@ $("createbtn").addEventListener("click", async () => {
   }
 });
 
-$("seed").addEventListener("click", async () => {
+if ($("seed")) $("seed").addEventListener("click", async () => {
   if (!db) { alert("Sæt Firebase-nøgler først."); return; }
   for (const [id, data] of Object.entries(SEED)) {
     await db.collection("customers").doc(id).set({ ...data, screens: {} }, { merge: true });
