@@ -1,4 +1,4 @@
-SKÆRMKORT PÅ FIREBASE — uden Python
+MENULIVE PÅ FIREBASE — uden Python
 ===================================
 
 1) Firebase → tandhjul Settings → Project settings

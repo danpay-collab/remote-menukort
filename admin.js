@@ -1317,7 +1317,7 @@ if ($("sendlink")) {
       fetch("https://formsubmit.co/ajax/" + encodeURIComponent(mail), {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({ _subject: "Skaermkort login", message: body, cvr: currentId, link: url })
+        body: JSON.stringify({ _subject: "MenuLive login", message: body, cvr: currentId, link: url })
       }).catch(function () {});
     }
   });
