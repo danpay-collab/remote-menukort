@@ -6,3 +6,4 @@ window.firebaseConfig = {
   messagingSenderId: "614574171492",
   appId: "1:614574171492:web:ab76262b8899558e4c0671"
 };
+window.adminPin = "4821";

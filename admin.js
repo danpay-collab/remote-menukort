@@ -304,6 +304,14 @@ if ($("hoursave")) {
 }
 
 function start() {
+  if (sessionStorage.getItem("adminOk") !== "1") {
+    const pin = window.prompt("Admin-kode");
+    if (pin !== String(window.adminPin || "4821")) {
+      document.body.innerHTML = "<p style='font-family:sans-serif;padding:40px'>Forkert kode. Brug kunde.html til butikken.</p>";
+      return;
+    }
+    sessionStorage.setItem("adminOk", "1");
+  }
   const cfg = window.firebaseConfig;
   if (!cfg || !cfg.apiKey || cfg.apiKey === "INDSÆT") {
     $("cfgwarn").classList.remove("hidden");
