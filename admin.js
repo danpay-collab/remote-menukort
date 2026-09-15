@@ -304,7 +304,9 @@ if ($("hoursave")) {
 }
 
 function start() {
-  if (sessionStorage.getItem("adminOk") !== "1") {
+  const kid = new URLSearchParams(location.search).get("id") || "";
+  const isKunde = new URLSearchParams(location.search).get("mode") === "kunde" && sessionStorage.getItem("kundeId") === kid && kid;
+  if (!isKunde && sessionStorage.getItem("adminOk") !== "1") {
     const pin = window.prompt("Admin-kode");
     if (pin !== String(window.adminPin || "4821")) {
       document.body.innerHTML = "<p style='font-family:sans-serif;padding:40px'>Forkert kode. Brug kunde.html til butikken.</p>";
@@ -323,8 +325,11 @@ function start() {
   if (KUNDEMODE) {
     applyKundeMode();
     const kid = new URLSearchParams(location.search).get("id") || sessionStorage.getItem("kundeId");
-    if (kid) openCustomer(kid);
-    else location.href = "kunde.html";
+    if (kid) {
+      openCustomer(kid).then(function () {
+        if (new URLSearchParams(location.search).get("studio") === "1" && $("viewmenu")) $("viewmenu").click();
+      });
+    } else location.href = "kunde.html";
   } else {
     initMap();
     db.collection("customers").onSnapshot((snap) => {

@@ -47,6 +47,7 @@
     <label>Lysavis-tekst <input id="ticker" /></label>
     <p id="msg" class="muted"></p>
     <button class="go" type="button" id="save">Gem</button>
+    <button class="ghost" type="button" id="menu">Vis menukort</button>
   </div>
   <div class="wrap hidden" id="first">
     <h1>Forste login</h1>
@@ -93,6 +94,7 @@
       if(!c.allowLogin){ $("err").textContent = "Login er ikke slaaet til."; return; }
       if(kode !== String(c.kundeKode || "")){ $("err").textContent = "Forkert kode."; return; }
       currentId = id;
+      sessionStorage.setItem("kundeId", id);
       fill(c);
       if(!c.kundePinChosen) show("first");
       else show("card");
@@ -107,6 +109,9 @@
       if(a.length < 4 || a !== b){ alert("Koden skal vaere ens og mindst 4 tegn."); return; }
       await db.collection("customers").doc(currentId).set({ kundeKode: a, kundePinChosen: true }, { merge: true });
       show("card");
+    };
+    $("menu").onclick = function(){
+      location.href = "admin.html?mode=kunde&id=" + encodeURIComponent(currentId) + "&studio=1";
     };
     $("save").onclick = async function(){
       await db.collection("customers").doc(currentId).set({
