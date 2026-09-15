@@ -1266,8 +1266,27 @@ if ($("sendlink")) {
     const url = "https://danpay-collab.github.io/remote-menukort/kunde.html?id=" + currentId;
     const body = "Log ind her: " + url + "\nCVR: " + currentId + "\nKode: " + kode;
     try { await navigator.clipboard.writeText(body); } catch (e) {}
-    alert(body);
-    if (mail) location.href = "mailto:" + encodeURIComponent(mail) + "?subject=" + encodeURIComponent("Skærmkort login") + "&body=" + encodeURIComponent(body);
+    if (!mail) {
+      alert("Ingen e-mail på kortet. Link:\n" + body);
+      return;
+    }
+    try {
+      const res = await fetch("https://formsubmit.co/ajax/" + encodeURIComponent(mail), {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          _subject: "Skærmkort login",
+          message: body,
+          cvr: currentId,
+          link: url
+        })
+      });
+      const j = await res.json().catch(function () { return {}; });
+      if (!res.ok) throw new Error(j.message || String(res.status));
+      alert("Mail sendt til " + mail + ".\nFørste gang skal kunden godkende en mail fra FormSubmit.\n\n" + body);
+    } catch (err) {
+      alert("Mail-tjenesten svarede ikke (" + err.message + "). Send selv:\n" + body);
+    }
   });
 }
 
