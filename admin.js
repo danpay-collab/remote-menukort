@@ -303,17 +303,38 @@ if ($("hoursave")) {
   });
 }
 
-function start() {
-  const kid = new URLSearchParams(location.search).get("id") || "";
-  const isKunde = new URLSearchParams(location.search).get("mode") === "kunde" && sessionStorage.getItem("kundeId") === kid && kid;
-  if (!isKunde && sessionStorage.getItem("adminOk") !== "1") {
-    const pin = window.prompt("Admin-kode");
-    if (pin !== String(window.adminPin || "4821")) {
-      document.body.innerHTML = "<p style='font-family:sans-serif;padding:40px'>Forkert kode. Brug kunde.html til butikken.</p>";
+
+function gateAdmin() {
+  db.collection("settings").doc("app").get().then(function (snap) {
+    const pin = snap.exists ? (snap.data().adminPin || "") : "";
+    const box = document.createElement("div");
+    box.style.cssText = "position:fixed;inset:0;background:#eceae6;z-index:999;display:flex;align-items:center;justify-content:center;font-family:sans-serif";
+    if (!pin) {
+      box.innerHTML = "<div style='background:#fff;padding:24px;border-radius:12px;width:min(360px,92vw)'><h2>Forste gang</h2><p>Saet din admin-kode. Kun dig.</p><input id='ap1' type='password' style='width:100%;padding:10px;margin:8px 0' /><input id='ap2' type='password' placeholder='Gentag' style='width:100%;padding:10px' /><p><button id='apsave'>Gem kode</button></p></div>";
+      document.body.appendChild(box);
+      document.getElementById("apsave").onclick = function () {
+        const a = document.getElementById("ap1").value || "";
+        const b = document.getElementById("ap2").value || "";
+        if (a.length < 4 || a !== b) { alert("Mindst 4 tegn, ens."); return; }
+        db.collection("settings").doc("app").set({ adminPin: a }, { merge: true }).then(function () {
+          sessionStorage.setItem("adminOk", "1");
+          location.reload();
+        });
+      };
       return;
     }
-    sessionStorage.setItem("adminOk", "1");
-  }
+    box.innerHTML = "<div style='background:#fff;padding:24px;border-radius:12px;width:min(360px,92vw)'><h2>Ingen adgang</h2><p>Kun administrator.</p><input id='apin' type='password' style='width:100%;padding:10px' placeholder='Admin-kode' /><p><button id='apgo'>Fortsæt</button></p><p><a href='kunde.html'>Til kunde-login</a></p></div>";
+    document.body.appendChild(box);
+    document.getElementById("apgo").onclick = function () {
+      if (document.getElementById("apin").value === pin) {
+        sessionStorage.setItem("adminOk", "1");
+        location.reload();
+      } else alert("Forkert kode.");
+    };
+  });
+}
+
+function start() {
   const cfg = window.firebaseConfig;
   if (!cfg || !cfg.apiKey || cfg.apiKey === "INDSÆT") {
     $("cfgwarn").classList.remove("hidden");
@@ -322,6 +343,12 @@ function start() {
   }
   firebase.initializeApp(cfg);
   db = firebase.firestore();
+  const kid0 = new URLSearchParams(location.search).get("id") || "";
+  const isKunde = new URLSearchParams(location.search).get("mode") === "kunde" && sessionStorage.getItem("kundeId") === kid0 && kid0;
+  if (!isKunde && sessionStorage.getItem("adminOk") !== "1") {
+    gateAdmin();
+    return;
+  }
   if (KUNDEMODE) {
     applyKundeMode();
     const kid = new URLSearchParams(location.search).get("id") || sessionStorage.getItem("kundeId");
@@ -1155,7 +1182,13 @@ if ($("sview")) {
     window.open("display.html?id=" + currentId + "&screen=" + activeScreen, "_blank");
   });
 }
-$("sclose").addEventListener("click", () => $("studio").classList.add("hidden"));
+$("sclose").addEventListener("click", () => {
+  $("studio").classList.add("hidden");
+  const id = new URLSearchParams(location.search).get("id") || sessionStorage.getItem("kundeId") || "";
+  if (new URLSearchParams(location.search).get("mode") === "kunde") {
+    location.href = "kunde.html?id=" + encodeURIComponent(id);
+  }
+});
 $("ssave").addEventListener("click", async () => {
   if (!db || !currentId) return;
   items = [];
