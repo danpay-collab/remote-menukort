@@ -1,5 +1,6 @@
 const $ = (id) => document.getElementById(id);
 const REGIONS = ["Nordjylland", "Midtjylland", "Sønderjylland", "Fyn", "Sjælland", "Lolland-Falster", "Bornholm"];
+const KUNDEMODE = new URLSearchParams(location.search).get("mode") === "kunde";
 let db = null;
 let currentId = null;
 let items = [];
@@ -23,7 +24,6 @@ function hourSummary(h) {
 let activeScreen = "1";
 let map, markers = {};
 let placeMode = false;
-const KUNDEMODE = new URLSearchParams(location.search).get("mode") === "kunde";
 
 const SEED = {
   "38765432": {
@@ -1244,6 +1244,7 @@ function applyKundeMode() {
   if (side) side.style.display = "none";
   if (map) map.style.display = "none";
   if ($("pcity")) $("pcity").textContent = ($("pcity").textContent || "") + " (låst)";
+  if ($("panel")) $("panel").classList.remove("hidden");
 }
 if ($("sendlink")) {
   $("sendlink").addEventListener("click", function () {
