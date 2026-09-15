@@ -76,7 +76,8 @@ body.kunde-mode .side,body.kunde-mode #map,body.kunde-mode #delcust,body.kunde-m
 
     #adminbar{position:sticky;top:0;z-index:80;display:flex;align-items:center;gap:10px;background:#111;color:#fff;padding:8px 16px;min-height:44px}
     #adminbar .ab-brand{font-weight:800}
-    #adminbar .ab-who{display:flex;flex-wrap:wrap;gap:8px;margin-left:auto}
+    #adminbar .ab-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    #adminbar .ab-who{display:flex;flex-wrap:wrap;gap:8px;margin:0}
     #adminbar .ab-chip{border:0;border-radius:999px;padding:6px 12px;font-weight:700;font-size:13px;color:#fff}
     #adminbar .ab-chip.on{background:#2e7d32}
     #adminbar .ab-chip.off{background:#c62828}
@@ -88,9 +89,11 @@ body.kunde-mode .side,body.kunde-mode #map,body.kunde-mode #delcust,body.kunde-m
 <body class="admin">
   <div id="adminbar">
     <span class="ab-brand">MenuLive</span>
+    <div class="ab-right">
     <div id="adminwho" class="ab-who"></div>
     <button type="button" class="ab-inv" id="admininvbtn">Inviter admin</button>
     <button type="button" class="ab-inv" id="adminout">Log ud</button>
+    </div>
   </div>
   <div class="shell">
     <aside class="side">
