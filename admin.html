@@ -53,9 +53,9 @@
     #panel.win .screen-row.is-off{background:#fdecea;border-color:#f5c2c0;color:#8a1f1f}
     #panel.win input,#panel.win select{width:100%;box-sizing:border-box}
 
-    #hourwiz .xlbox{max-width:560px!important;padding:20px}
-    #hourwiz #hourrows > div{grid-template-columns:110px 130px 130px auto!important;gap:12px!important}
-    #hourwiz input[type=time]{font-size:18px!important;padding:10px 8px!important;min-height:44px;width:130px}
+    #hourwiz .xlbox{max-width:640px!important;width:min(640px,94vw)!important;padding:20px;overflow:hidden}
+    #hourwiz #hourrows > div{grid-template-columns:100px 1fr 1fr 90px!important;gap:10px!important;width:100%}
+    #hourwiz input[type=time]{font-size:18px!important;padding:10px 8px!important;min-height:44px;width:100%!important;box-sizing:border-box}
     #hourwiz label.tick{font-size:15px}
 
 </style>
