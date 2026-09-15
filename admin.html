@@ -74,9 +74,9 @@ body.kunde-mode .side,body.kunde-mode #map,body.kunde-mode #delcust,body.kunde-m
     body.kunde-mode #svid, body.kunde-mode #svid2, body.kunde-mode #svid3,
     body.kunde-mode #svidsec, body.kunde-mode #svidgap {display:none!important}
 
-    #adminbar{position:sticky;top:0;z-index:80;display:flex;align-items:center;gap:12px;background:#111;color:#fff;padding:8px 16px;min-height:44px}
-    #adminbar .ab-brand{font-weight:800;margin-right:8px}
-    #adminbar .ab-who{display:flex;flex-wrap:wrap;gap:8px;flex:1}
+    #adminbar{position:sticky;top:0;z-index:80;display:flex;align-items:center;gap:10px;background:#111;color:#fff;padding:8px 16px;min-height:44px}
+    #adminbar .ab-brand{font-weight:800}
+    #adminbar .ab-who{display:flex;flex-wrap:wrap;gap:8px;margin-left:auto}
     #adminbar .ab-chip{border:0;border-radius:999px;padding:6px 12px;font-weight:700;font-size:13px;color:#fff}
     #adminbar .ab-chip.on{background:#2e7d32}
     #adminbar .ab-chip.off{background:#c62828}
@@ -94,7 +94,7 @@ body.kunde-mode .side,body.kunde-mode #map,body.kunde-mode #delcust,body.kunde-m
   </div>
   <div class="shell">
     <aside class="side">
-      <h1>MenuLive</h1>
+      <h1 style="display:none">MenuLive</h1>
       <p class="lead">Kunder efter CVR. Listen er delt i landsdele.</p>
       <p id="cfgwarn" class="warn hidden">Indsæt Firebase-nøgler i firebase-config.js</p>
       <button type="button" class="ghost light" id="newbtn">+ Ny kunde</button>

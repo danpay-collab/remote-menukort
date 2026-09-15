@@ -322,7 +322,8 @@ function paintAdminBar() {
       const b = document.createElement("span");
       b.className = "ab-chip " + (on ? "on" : "off");
       b.textContent = a.name || d.id;
-      if ((a.name || d.id) === currentAdminName) {
+      const mine = adminSlug(a.name || d.id) === adminSlug(currentAdminName || sessionStorage.getItem("adminName") || localStorage.getItem("adminName") || "");
+      if (mine) {
         b.style.cursor = "pointer";
         b.title = "Skift kode";
         b.onclick = async function () {
