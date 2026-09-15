@@ -1245,24 +1245,29 @@ function applyKundeMode() {
 }
 if ($("sendlink")) {
   $("sendlink").addEventListener("click", async function () {
-    if (!currentId) return;
+    if (!currentId) { alert("Åbn kunden først."); return; }
     let kode = ($("ekode") && $("ekode").value) || "";
     if (!kode) {
       kode = makePairCode();
       if ($("ekode")) $("ekode").value = kode;
     }
     if ($("eallow")) $("eallow").checked = true;
-    await db.collection("customers").doc(currentId).set({
-      allowLogin: true,
-      kundeKode: kode,
-      kundePinChosen: false
-    }, { merge: true });
+    try {
+      await db.collection("customers").doc(currentId).set({
+        allowLogin: true,
+        kundeKode: kode,
+        kundePinChosen: false
+      }, { merge: true });
+    } catch (err) {
+      alert("Kunne ikke gemme koden: " + err.message);
+      return;
+    }
     const mail = ($("eemail") && $("eemail").value) || "";
-    const url = location.origin + location.pathname.replace(/admin.html.*/, "kunde.html") + "?id=" + currentId;
+    const url = "https://danpay-collab.github.io/remote-menukort/kunde.html?id=" + currentId;
     const body = "Log ind her: " + url + "\nCVR: " + currentId + "\nKode: " + kode;
-    try { await navigator.clipboard.writeText(url + "\n" + body); } catch (e) {}
+    try { await navigator.clipboard.writeText(body); } catch (e) {}
+    alert(body);
     if (mail) location.href = "mailto:" + encodeURIComponent(mail) + "?subject=" + encodeURIComponent("Skærmkort login") + "&body=" + encodeURIComponent(body);
-    else alert("Link kopieret.\n" + body);
   });
 }
 
