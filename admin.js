@@ -1440,3 +1440,11 @@ if ($("invsend")) $("invsend").addEventListener("click", async function () {
   if ($("invname")) $("invname").value = "";
   if ($("invmail")) $("invmail").value = "";
 });
+
+if ($("adminout")) $("adminout").addEventListener("click", function () {
+  sessionStorage.removeItem("adminOk");
+  sessionStorage.removeItem("adminName");
+  localStorage.removeItem("adminOk");
+  localStorage.removeItem("adminName");
+  location.href = "admin.html";
+});
